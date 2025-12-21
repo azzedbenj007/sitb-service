@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service SITB - Hôpital des Enfants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .actions-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px;
+            background: #f8f9fa;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .action-card h3 {
+            color: #1e3c72;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-card p {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .icon {
+            font-size: 1.5em;
+        }
+        
+        .organigramme-section {
+            padding: 40px;
+        }
+        
+        .organigramme-section h2 {
+            color: #1e3c72;
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        .org-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .org-level {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .org-box {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 280px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .org-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .org-box.chef {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            min-width: 350px;
+        }
+        
+        .org-box.unite {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .org-box h4 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: inherit;
+        }
+        
+        .org-box.chef h4, .org-box.unite h4 {
+            color: white;
+        }
+        
+        .org-box .name {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #1e3c72;
+        }
+        
+        .org-box.chef .name, .org-box.unite .name {
+            color: #ffd700;
+        }
+        
+        .org-box .grade {
+            font-style: italic;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        
+        .org-box .contact {
+            font-size: 0.9em;
+            margin-top: 8px;
+            opacity: 0.85;
+        }
+        
+        .org-box .contact a {
+            color: inherit;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .org-box .contact a:hover {
+            opacity: 0.7;
+            text-decoration: underline;
+        }
+        
+        .org-box .mission {
+            font-size: 0.95em;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .org-box:not(.chef):not(.unite) .name {
+            color: #667eea;
+        }
+        
+        .org-box:not(.chef):not(.unite) .mission {
+            border-top: 1px solid #e0e0e0;
+            color: #555;
+        }
+        
+        .sub-team {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        
+        .sub-team .member {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+        }
+        
+        footer {
+            background: #1e3c72;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .actions-section {
+                padding: 20px;
+            }
+            
+            .org-box {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏥 Service SITB</h1>
+            <p>Service des Installations Techniques et Bâtiments</p>
+            <p>Hôpital des Enfants - Rabat</p>
+        </header>
+        
+        <div class="actions-section">
+            <div class="action-card">
+                <h3><span class="icon">🔧</span> Demande d'Intervention</h3>
+                <p>Signalez un problème technique nécessitant une intervention corrective urgente ou programmée. Notre équipe technique interviendra dans les plus brefs délais pour résoudre votre demande.</p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSc35-Rf2HYfS5GkPxdLCiw_L1B7DpH14dtaqUAky1CJflikiQ/viewform" target="_blank" class="cta-button">Faire une demande d'intervention</a>
+            </div>
+            
+            <div class="action-card">
+                <h3><span class="icon">📋</span> Expression de Besoin</h3>
+                <p>Exprimez vos besoins en matériel, équipement ou amélioration des installations. Cette demande permet de planifier les investissements et les projets d'amélioration du service.</p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSeSJ2ju6bsYrZ1uYIMm0aFH7Q9CpekyJwArMOhU-fjZcRXUxg/viewform" target="_blank" class="cta-button">Exprimer un besoin</a>
+            </div>
+        </div>
+        
+        <div class="organigramme-section">
+            <h2>📊 Organigramme du Service SITB</h2>
+            
+            <div class="org-chart">
+                <div class="org-level">
+                    <div class="org-box chef">
+                        <h4>👨‍💼 Chef de Service</h4>
+                        <div class="name">Mohammed MAZOUZI</div>
+                        <div class="grade">Ingénieur d'État Grade Principal</div>
+                        <div class="contact">📞 <a href="tel:0668369078">0668369078</a></div>
+                        <div class="contact">✉️ <a href="mailto:mm.mazouzi@gmail.com">mm.mazouzi@gmail.com</a></div>
+                        <div class="mission">Responsable du service des installations techniques et des bâtiments, rattaché directement au Directeur de l'Hôpital des Enfants</div>
+                    </div>
+                </div>
+                
+                <div class="org-level">
+                    <div class="org-box">
+                        <h4>🔗 Adjoint au Chef de Service</h4>
+                        <div class="name">Azzeddine BENJEOUACH</div>
+                        <div class="grade">Ingénieur d'État Grade Principal</div>
+                        <div class="contact">📞 <a href="tel:0624536661">0624536661</a> / <a href="tel:0662892929">0662892929</a></div>
+                        <div class="contact">✉️ <a href="mailto:benjeouachazzeddine9@gmail.com">benjeouachazzeddine9@gmail.com</a></div>
+                        <div class="mission">Chargé de l'ingénierie et de la coordination</div>
+                    </div>
+                    
+                    <div class="org-box">
+                        <h4>📄 Gestion Administrative</h4>
+                        <div class="name">Nadia BOUIFLAN</div>
+                        <div class="grade">Administrateur 1er Grade</div>
+                        <div class="mission">Chargée de la gestion administrative du service</div>
+                    </div>
+                </div>
+                
+                <div class="org-level">
+                    <div class="org-box unite">
+                        <h4>🏗️ Unité Bâtiment</h4>
+                        <div class="name">Amal EL FARISSI</div>
+                        <div class="grade">Technicienne 3e Grade - Chef d'Unité</div>
+                        <div class="contact">📞 <a href="tel:0667099336">0667099336</a> / <a href="tel:0610116072">0610116072</a></div>
+                        <div class="contact">✉️ <a href="mailto:amalelfarissi.her@gmail.com">amalelfarissi.her@gmail.com</a></div>
+                        
+                        <div class="sub-team">
+                            <div class="member">
+                                <div class="name">Aziz OUMALICH</div>
+                                <div class="grade">Adjoint technique 3e Grade</div>
+                                <div class="mission">Chargé du suivi des contrats et travaux relatifs à l'assainissement</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="org-box unite">
+                        <h4>⚙️ Unité Installations Techniques</h4>
+                        <div class="name">Azeddine EL GASMI</div>
+                        <div class="grade">Technicien 1er Grade - Chef d'Unité</div>
+                        <div class="contact">📞 <a href="tel:0661540345">0661540345</a></div>
+                        
+                        <div class="sub-team">
+                            <div class="member">
+                                <div class="name">Youssef KHAYACH</div>
+                                <div class="grade">Technicien 3e Grade</div>
+                                <div class="contact">📞 <a href="tel:0636321415">0636321415</a></div>
+                                <div class="contact">✉️ <a href="mailto:KHIYACH96@gmail.com">KHIYACH96@gmail.com</a></div>
+                                <div class="mission">Climatisation, CTA, chambres froides, chauffage et eau chaude sanitaire</div>
+                            </div>
+                            
+                            <div class="member">
+                                <div class="name">Ayoub BEN RABEH</div>
+                                <div class="grade">Technicien 2e Grade</div>
+                                <div class="contact">📞 <a href="tel:0667898428">0667898428</a> / <a href="tel:0607178780">0607178780</a></div>
+                                <div class="contact">✉️ <a href="mailto:benrabehayoub@gmail.com">benrabehayoub@gmail.com</a></div>
+                                <div class="mission">Plomberie, évacuations, puits, RIA, vidéosurveillance, banque de tissus et extincteurs</div>
+                            </div>
+                            
+                            <div class="member">
+                                <div class="name">Ayoub ESSAADI</div>
+                                <div class="grade">Technicien 3e Grade</div>
+                                <div class="contact">📞 <a href="tel:0691457783">0691457783</a> / <a href="tel:0666304990">0666304990</a></div>
+                                <div class="contact">✉️ <a href="mailto:ayoubessaadi159@gmail.com">ayoubessaadi159@gmail.com</a></div>
+                                <div class="mission">Ascenseurs, bloc central, stérilisation, morgue et salles d'allogreffe</div>
+                            </div>
+                            
+                            <div class="member">
+                                <div class="name">Ahmed OSSMANE</div>
+                                <div class="grade">Technicien 3e Grade</div>
+                                <div class="contact">📞 <a href="tel:0661883170">0661883170</a></div>
+                                <div class="mission">Photocopieuses et fax</div>
+                            </div>
+                            
+                            <div class="member">
+                                <div class="name">Hamza EZRAÏDY</div>
+                                <div class="grade">Technicien 3e Grade</div>
+                                <div class="contact">📞 <a href="tel:0661289709">0661289709</a></div>
+                                <div class="contact">✉️ <a href="mailto:hezraidy@gmail.com">hezraidy@gmail.com</a></div>
+                                <div class="mission">Fluides médicaux, centrales d'oxygène, d'azote, distribution d'azote liquide et banque de tissu du CHOP</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="org-box unite">
+                        <h4>⚡ Unité Électricité (CFO/CFA)</h4>
+                        <div class="name">Mohamed TEBBAL</div>
+                        <div class="grade">Adjoint technique 2e Grade - Chef d'Unité</div>
+                        <div class="contact">📞 <a href="tel:0661214802">0661214802</a></div>
+                        <div class="contact">✉️ <a href="mailto:mohamed2017.tebal@gmail.com">mohamed2017.tebal@gmail.com</a></div>
+                        
+                        <div class="sub-team">
+                            <div class="member">
+                                <div class="name">Ayoub SITI</div>
+                                <div class="grade">Technicien 3e Grade</div>
+                                <div class="contact">📞 <a href="tel:0684670588">0684670588</a> / <a href="tel:0667796470">0667796470</a></div>
+                                <div class="contact">✉️ <a href="mailto:ayoub.siti.96@gmail.com">ayoub.siti.96@gmail.com</a></div>
+                                <div class="mission">Installations électriques CFO/CFA, groupes électrogènes, onduleurs</div>
+                            </div>
+                            
+                            <div class="member">
+                                <div class="name">Achraf IKENSSAS</div>
+                                <div class="grade">Technicien 3e Grade</div>
+                                <div class="contact">📞 <a href="tel:0610962037">0610962037</a> / <a href="tel:0708181421">0708181421</a></div>
+                                <div class="contact">✉️ <a href="mailto:achraf.ikenssas@gmail.com">achraf.ikenssas@gmail.com</a></div>
+                                <div class="mission">Installations électriques CFO/CFA, groupes électrogènes, onduleurs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2024 Service SITB - Hôpital des Enfants de Rabat</p>
+            <p>Pour toute urgence, contactez le chef de service</p>
+        </footer>
+    </div>
+</body>
+</html>
