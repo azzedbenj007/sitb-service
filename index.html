@@ -409,33 +409,6 @@
             <p>Pour toute urgence, contactez le chef de service</p>
         </footer>
     </div>
-    <script type="module">
-    import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
-
-    createChat({
-        webhookUrl: 'https://n8n.srv881398.hstgr.cloud/webhook/113902ff-78a4-4505-b8e4-7f304e358f13/chat',
-        target: 'body', 
-        mode: 'window', 
-        initialMessages: [
-            'Bonjour ! Je suis l\'assistant virtuel du SITB. Comment puis-je vous aider ?'
-        ],
-        i18n: {
-            en: {
-                title: 'Assistant SITB',
-                subtitle: 'Support Technique',
-                footer: '',
-                getStarted: 'Démarrer la discussion',
-                inputPlaceholder: 'Posez votre question...',
-            },
-        },
-        style: {
-            default: {
-                primaryColor: '#1e3c72', 
-                secondaryColor: '#667eea',
-            }
-        }
-    });
-    </script>
 
 </body>
 </html>
