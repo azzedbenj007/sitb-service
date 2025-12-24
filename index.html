@@ -410,35 +410,5 @@
         </footer>
     </div>
     
-    <!-- Chat button -->
-    <a
-      class="chat-button"
-      href="https://n8n.srv881398.hstgr.cloud/webhook/1766a42c-b256-467d-9258-cff12f046f9c/chat"
-      target="_blank"
-      rel="noopener"
-      aria-label="Ouvrir le chat du service SITB"
-      title="Chat avec le service SITB"
-      onclick="openChatPopup(event)"
-    >
-        💬
-        <span class="chat-badge" aria-hidden="true">!</span>
-    </a>
-    
-    <script>
-        // Open the chat URL in a centered popup window (user-initiated click)
-        function openChatPopup(event) {
-            // Allow normal navigation if user opened in a new tab via middle-click or ctrl/cmd+click
-            if (event.ctrlKey || event.metaKey || event.button === 1) {
-                return;
-            }
-            event.preventDefault();
-            var url = event.currentTarget.href;
-            var width = 420;
-            var height = 720;
-            var left = (window.screen.width / 2) - (width / 2);
-            var top = (window.screen.height / 2) - (height / 2);
-            window.open(url, 'SITBChat', 'toolbar=0,location=0,status=0,menubar=0,scrollbars=1,resizable=1,width=' + width + ',height=' + height + ',top=' + top + ',left=' + left);
-        }
-    </script>
 </body>
 </html>
