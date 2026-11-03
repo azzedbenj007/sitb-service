@@ -65,11 +65,15 @@
   #chargement { color: var(--doux); }
   .principal { width: 100%; margin-top: 12px; min-height: 48px; border: 1px solid var(--bleu); border-radius: 7px; background: var(--bleu); color: #04101f; font: inherit; font-weight: 700; cursor: pointer; }
   .libre { margin-bottom: 0; }
+  .article { margin-bottom: 8px; }
+  .details { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; padding: 8px 10px 4px; }
+  .details[hidden] { display: none; }
   section[hidden], #barre[hidden] { display: none; }
   @media (max-width: 620px) {
     .grille, .cases { grid-template-columns: minmax(0, 1fr); }
     .ligne-op { flex-direction: column; align-items: stretch; gap: 8px; }
     .choix button { flex: 1; }
+    .details { grid-template-columns: minmax(0, 1fr); }
     .piece { grid-template-columns: minmax(0, 1fr) 84px; }
     .piece .remarque { grid-column: 1 / 2; }
   }
@@ -117,7 +121,7 @@
     </section>
     <section>
       <h2>Articles concernés</h2>
-      <div class="cases" id="articles"></div>
+      <div id="articles"></div>
     </section>
     <div id="sections"></div>
     <section>
@@ -150,7 +154,7 @@
 (function () {
   'use strict';
   var BASE = 'https://n8n.srv881398.hstgr.cloud/webhook/rapport-compresseur';
-  var CLE_BROUILLON = 'sitb_rp_ac_tri_brouillon_v2';
+  var CLE_BROUILLON = 'sitb_rp_ac_tri_brouillon_v3';
   var CLE_MODELE = 'sitb_rp_ac_tri_modele_v2';
   var CLE_CODE = 'sitb_rp_ac_code';
   var CHAMPS = ['marche', 'societe', 'intervenants', 'charge_suivi', 'date', 'heure_debut', 'heure_fin', 'trimestre', 'annee', 'etat', 'resultat', 'observation'];
@@ -218,17 +222,36 @@
   function appliquerSections() {
     modele.sections.forEach(function (s) { $('sec-' + s.id).hidden = etat.sections.indexOf(s.id) < 0; });
     var permis = actives().reduce(function (t, s) { return t.concat(s.articles); }, []);
-    etat.articles = etat.articles.filter(function (a) { return permis.indexOf(a) >= 0; });
+    etat.articles = etat.articles.filter(function (a) { return permis.indexOf(a.id) >= 0; });
     var articles = $('articles'); articles.textContent = '';
     permis.forEach(function (a) {
+      var bloc = document.createElement('div'); bloc.className = 'article';
       var l = document.createElement('label'); l.className = 'case';
       var c = document.createElement('input'); c.type = 'checkbox'; c.value = a;
-      c.checked = etat.articles.indexOf(a) >= 0;
+      var saisie = etat.articles.filter(function (x) { return x.id === a; })[0];
+      c.checked = !!saisie;
+      var details = document.createElement('div'); details.className = 'details';
+      function champ(cle, texte) {
+        var lab = document.createElement('label'); lab.className = 'champ'; lab.textContent = texte;
+        var i = document.createElement('input'); i.maxLength = cle === 'serie' ? 60 : 150;
+        i.value = saisie ? (saisie[cle] || '') : '';
+        i.addEventListener('input', function () { if (saisie) { saisie[cle] = i.value; modifie(); } });
+        i.dataset.cle = cle; lab.appendChild(i); return lab;
+      }
+      details.appendChild(champ('designation', 'Désignation exacte'));
+      details.appendChild(champ('serie', 'N° de série'));
+      details.hidden = !saisie;
       c.addEventListener('change', function () {
-        etat.articles = Array.prototype.slice.call(articles.querySelectorAll('input:checked')).map(function (x) { return x.value; });
-        modifie();
+        if (c.checked) {
+          saisie = { id: a, designation: a, serie: '' }; etat.articles.push(saisie);
+          details.querySelectorAll('input').forEach(function (i) { i.value = saisie[i.dataset.cle]; });
+        } else {
+          etat.articles = etat.articles.filter(function (x) { return x.id !== a; }); saisie = null;
+        }
+        details.hidden = !c.checked; modifie();
       });
-      l.appendChild(c); l.appendChild(document.createTextNode(a)); articles.appendChild(l);
+      l.appendChild(c); l.appendChild(document.createTextNode(a));
+      bloc.appendChild(l); bloc.appendChild(details); articles.appendChild(bloc);
     });
     compter();
   }
