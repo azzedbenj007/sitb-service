@@ -7,9 +7,9 @@
 <title>Rapports préventifs fluides médicaux | SITB</title>
 <style>
   :root {
-    --fond: #0b1220; --panneau: #121c2f; --champ: #0e1728; --bord: #27364f;
-    --texte: #e8eef8; --doux: #9fb0c8; --bleu: #2f8cff; --bleu-fort: #62a9ff;
-    --vert: #1fa971; --rouge: #e5484d;
+    --fond: #f3f6fb; --panneau: #ffffff; --champ: #ffffff; --bord: #c9d5e4;
+    --texte: #16243a; --doux: #55647a; --bleu: #1565d8; --bleu-fort: #1258c0;
+    --vert: #157a4f; --rouge: #c8303a;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -28,7 +28,7 @@
   .grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .large { grid-column: 1 / -1; }
   label.champ { display: block; font-size: 14px; color: var(--doux); }
-  input, select, textarea { width: 100%; margin-top: 4px; min-height: 44px; padding: 9px 10px; background: var(--champ); color: var(--texte); border: 1px solid var(--bord); border-radius: 7px; font: inherit; color-scheme: dark; }
+  input, select, textarea { width: 100%; margin-top: 4px; min-height: 44px; padding: 9px 10px; background: var(--champ); color: var(--texte); border: 1px solid var(--bord); border-radius: 7px; font: inherit; color-scheme: light; }
   input[readonly] { color: var(--doux); }
   textarea { min-height: 76px; resize: vertical; }
   input:focus, select:focus, textarea:focus, button:focus-visible, summary:focus-visible { outline: 2px solid var(--bleu); outline-offset: 1px; }
@@ -50,9 +50,9 @@
   .libelle { font-size: 15px; }
   .ligne-op input { margin-top: 0; }
   .choix { display: flex; flex: none; border: 1px solid var(--bord); border-radius: 7px; overflow: hidden; }
-  .choix button { min-height: 44px; min-width: 76px; padding: 0 10px; border: 0; background: var(--champ); color: var(--doux); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .choix button { min-height: 44px; min-width: 76px; padding: 0 10px; border: 0; background: #eef2f8; color: var(--doux); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
   .choix button + button { border-left: 1px solid var(--bord); }
-  .choix button[aria-pressed="true"].fait { background: var(--vert); color: #06140e; }
+  .choix button[aria-pressed="true"].fait { background: var(--vert); color: #fff; }
   .choix button[aria-pressed="true"].non { background: var(--rouge); color: #fff; }
   .operation.a-revoir .choix { border-color: var(--rouge); }
   .operation > input { margin-top: 9px; }
@@ -61,17 +61,17 @@
   .retirer { min-height: 44px; border: 1px solid var(--bord); border-radius: 7px; background: var(--champ); color: var(--doux); font-size: 20px; cursor: pointer; }
   .secondaire { min-height: 44px; padding: 0 14px; border: 1px solid var(--bord); border-radius: 7px; background: transparent; color: var(--bleu-fort); font: inherit; font-weight: 600; cursor: pointer; }
   .logo-zone { display: flex; gap: 10px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
-  .logo-zone img { max-height: 56px; max-width: 150px; background: #fff; border-radius: 4px; padding: 3px; }
+  .logo-zone img { max-height: 56px; max-width: 150px; background: #fff; border: 1px solid var(--bord); border-radius: 4px; padding: 3px; }
   .logo-zone input[type=file] { flex: 1 1 180px; padding: 8px; }
-  .principal { width: 100%; margin-top: 12px; min-height: 48px; border: 1px solid var(--bleu); border-radius: 7px; background: var(--bleu); color: #04101f; font: inherit; font-weight: 700; cursor: pointer; }
-  #barre { position: fixed; left: 0; right: 0; bottom: 0; background: #0a101ddd; backdrop-filter: blur(6px); border-top: 1px solid var(--bord); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .principal { width: 100%; margin-top: 12px; min-height: 48px; border: 1px solid var(--bleu); border-radius: 7px; background: var(--bleu); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+  #barre { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, .94); backdrop-filter: blur(6px); border-top: 1px solid var(--bord); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
   .barre-int { max-width: 828px; margin: 0 auto; }
   .avancement { display: flex; justify-content: space-between; font-size: 13px; color: var(--doux); margin-bottom: 6px; gap: 12px; }
   .jauge { height: 5px; background: var(--bord); border-radius: 3px; overflow: hidden; margin-bottom: 9px; }
   .jauge div { height: 100%; width: 0; background: var(--bleu); transition: width .15s; }
   .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .actions button { min-height: 48px; border-radius: 7px; border: 1px solid var(--bleu); font: inherit; font-weight: 700; cursor: pointer; }
-  #btn-pdf { background: var(--bleu); color: #04101f; }
+  #btn-pdf { background: var(--bleu); color: #fff; }
   #btn-imprimer, #btn-excel { background: transparent; color: var(--bleu-fort); }
   .actions button:disabled { opacity: .55; cursor: wait; }
   #message { max-width: 828px; margin: 0 auto 14px; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--bord); background: var(--panneau); font-size: 15px; }
