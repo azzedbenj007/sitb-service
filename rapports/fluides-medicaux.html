@@ -69,22 +69,37 @@
   .avancement { display: flex; justify-content: space-between; font-size: 13px; color: var(--doux); margin-bottom: 6px; gap: 12px; }
   .jauge { height: 5px; background: var(--bord); border-radius: 3px; overflow: hidden; margin-bottom: 9px; }
   .jauge div { height: 100%; width: 0; background: var(--bleu); transition: width .15s; }
-  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .actions button { min-height: 48px; border-radius: 7px; border: 1px solid var(--bleu); font: inherit; font-weight: 700; cursor: pointer; }
   #btn-pdf { background: var(--bleu); color: #04101f; }
-  #btn-imprimer { background: transparent; color: var(--bleu-fort); }
+  #btn-imprimer, #btn-excel { background: transparent; color: var(--bleu-fort); }
   .actions button:disabled { opacity: .55; cursor: wait; }
   #message { max-width: 828px; margin: 0 auto 14px; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--bord); background: var(--panneau); font-size: 15px; }
   #message.erreur { border-color: var(--rouge); }
   #message.succes { border-color: var(--vert); }
   #message ul { margin: 6px 0 0; padding-left: 20px; }
   #chargement { color: var(--doux); }
+  #bandeau-admin { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--bleu-fort); font-weight: 600; font-size: 14px; }
+  .ajout-ligne { margin-top: 10px; }
+  .ligne-suppr { display: flex; gap: 8px; align-items: center; }
+  .ligne-suppr .libre { flex: 1; min-width: 0; }
+  .adm-op { display: grid; grid-template-columns: minmax(0, 1fr) 130px 44px 44px; gap: 8px; margin-bottom: 8px; }
+  .adm-eq { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) 44px; gap: 8px; margin-bottom: 8px; }
+  .adm-op input, .adm-op select, .adm-eq input { margin-top: 0; }
+  .danger { color: var(--rouge); border-color: var(--rouge); }
+  #admin-barre { position: sticky; bottom: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; background: var(--fond); }
+  #admin-barre button { min-height: 48px; }
   @media (max-width: 620px) {
     .grille, .cases, .details { grid-template-columns: minmax(0, 1fr); }
     .ligne-op { flex-direction: column; align-items: stretch; gap: 8px; }
     .choix button { flex: 1; }
     .piece { grid-template-columns: minmax(0, 1fr) 84px; }
     .piece .remarque { grid-column: 1 / 2; }
+    .adm-op { grid-template-columns: minmax(0, 1fr) 44px 44px; padding-bottom: 8px; border-bottom: 1px solid var(--bord); }
+    .adm-op input { grid-column: 1 / -1; }
+    .adm-eq { grid-template-columns: minmax(0, 1fr) 44px; padding-bottom: 8px; border-bottom: 1px solid var(--bord); }
+    .adm-eq input { grid-column: 1; }
+    .adm-eq .retirer { grid-row: 1; grid-column: 2; }
   }
 </style>
 </head>
@@ -96,6 +111,29 @@
 </header>
 <main>
   <div id="message" role="status" aria-live="polite" hidden></div>
+  <div id="bandeau-admin" hidden><span>Mode administrateur</span><button type="button" class="secondaire" id="btn-admin">Gérer le modèle</button></div>
+  <div id="admin" hidden>
+    <section>
+      <h2>Modèle du rapport</h2>
+      <p class="aide">Rien n'est appliqué avant « Enregistrer le modèle ». Les rapports déjà générés ne changent pas.</p>
+      <div class="grille" id="adm-general"></div>
+    </section>
+    <section>
+      <h2>Résumé Telegram</h2>
+      <p class="aide">Envoyé par Nova Master au superviseur après chaque rapport.</p>
+      <label class="case"><input type="checkbox" id="adm-notif"> Envoyer le résumé</label>
+      <label class="champ ajout-ligne">Identifiant Telegram du superviseur<input id="adm-chat" inputmode="numeric" maxlength="20"></label>
+    </section>
+    <section>
+      <h2>Sous-systèmes</h2>
+      <div id="adm-types"></div>
+      <button type="button" class="secondaire" id="adm-ajout-type">Ajouter un sous-système</button>
+    </section>
+    <div id="admin-barre">
+      <button type="button" class="principal" id="adm-enregistrer" style="margin-top:0">Enregistrer le modèle</button>
+      <button type="button" class="secondaire" id="adm-fermer">Annuler</button>
+    </div>
+  </div>
   <section id="acces" hidden>
     <h2>Accès réservé</h2>
     <form id="form-acces">
@@ -129,9 +167,6 @@
           <select id="trimestre"><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option><option value="T4">T4</option></select>
         </label>
         <label class="champ">Année<input id="annee" inputmode="numeric" maxlength="4" required></label>
-        <label class="champ large">État fonctionnel
-          <select id="etat" required><option value="">Choisir</option><option>En service</option><option>En panne</option></select>
-        </label>
       </div>
     </section>
     <section>
@@ -141,7 +176,7 @@
     </section>
     <section id="bloc-articles" hidden>
       <h2>Articles concernés</h2>
-      <p class="aide">Cochez les équipements à regrouper dans ce rapport. Chaque équipement aura sa propre section.</p>
+      <p class="aide">Cochez les équipements à regrouper dans ce rapport, puis indiquez l'état de chacun. Chaque équipement aura sa propre section.</p>
       <div id="articles"></div>
     </section>
     <div id="sections"></div>
@@ -167,6 +202,7 @@
     <div class="jauge"><div id="jauge"></div></div>
     <div class="actions">
       <button type="button" id="btn-pdf">Générer le PDF</button>
+      <button type="button" id="btn-excel">Excel modifiable</button>
       <button type="button" id="btn-imprimer">Imprimer</button>
     </div>
   </div>
@@ -176,10 +212,11 @@
   'use strict';
   var BASE = 'https://n8n.srv881398.hstgr.cloud/webhook/rapport-fluides';
   var CLE_BROUILLON = 'sitb_rp_fm_brouillon_v4';
-  var CLE_MODELE = 'sitb_rp_fm_modele_v4';
+  var CLE_MODELE = 'sitb_rp_fm_modele_v5';
   var CLE_ENTETE = 'sitb_rp_fm_entete_v1';
   var CLE_CODE = 'sitb_rp_ac_code';
-  var CHAMPS_META = ['marche', 'societe', 'intervenants', 'charge_suivi', 'local', 'date', 'periodicite', 'heure_debut', 'heure_fin', 'trimestre', 'annee', 'etat'];
+  var CHAMPS_META = ['marche', 'societe', 'intervenants', 'charge_suivi', 'local', 'date', 'periodicite', 'heure_debut', 'heure_fin', 'trimestre', 'annee'];
+  var MAX_LIBRES = 20, role = 'technicien', rev = 0, notif = null, adm = null;
   var MAX_EQUIPEMENTS = 40;
   var modele = null, dernier = null, enCours = false, pret = false, compteurUid = 0;
   var etat = { types: [], instances: [], pieces: [] };
@@ -217,7 +254,7 @@
   }
   function nouvelleInstance(type, source, designation, serie) {
     compteurUid += 1;
-    return { uid: 'i' + Date.now() + compteurUid, type: type, source: source, designation: designation, serie: serie, operations: {} };
+    return { uid: 'i' + Date.now() + compteurUid, type: type, source: source, designation: designation, serie: serie, etat: '', operations: {} };
   }
   function trimestreDe(d) { return 'T' + (Math.floor((parseInt(d.slice(5, 7), 10) - 1) / 3) + 1); }
   function aujourdhui() {
@@ -256,13 +293,21 @@
     img.src = url;
   }
 
+  function clesLibres(inst) {
+    return Object.keys(inst.operations).filter(function (k) { return /^libre\d+$/.test(k); })
+      .concat(['libre1', 'libre2'])
+      .filter(function (k, i, l) { return l.indexOf(k) === i; })
+      .sort(function (a, b) { return Number(a.slice(5)) - Number(b.slice(5)); });
+  }
   function construire() {
     $('client').value = modele.client;
-    var per = $('periodicite'); per.textContent = '';
+    var per = $('periodicite'), perAvant = per.value, resAvant = $('resultat').value; per.textContent = '';
     modele.periodicites.forEach(function (p) { var o = el('option', '', p.libelle); o.value = p.code; per.appendChild(o); });
     var res = $('resultat'); res.textContent = '';
     var vide = el('option', '', 'Choisir'); vide.value = ''; res.appendChild(vide);
     modele.resultats.forEach(function (r) { res.appendChild(el('option', '', r)); });
+    if (perAvant) per.value = perAvant;
+    if (resAvant) res.value = resAvant;
     var boite = $('sous-systemes'); boite.textContent = '';
     modele.types.forEach(function (t) {
       var l = el('label', 'case');
@@ -296,6 +341,13 @@
     var d = el('div', 'details');
     d.appendChild(champTexte('Désignation exacte', inst.designation, 150, function (v) { inst.designation = v; }));
     d.appendChild(champTexte('N° de série', inst.serie, 80, function (v) { inst.serie = v; }));
+    var lab = el('label', 'champ', 'État fonctionnel');
+    var sel = el('select'); sel.id = 'etat-' + inst.uid;
+    var choix = el('option', '', 'Choisir'); choix.value = ''; sel.appendChild(choix);
+    modele.etats.forEach(function (x) { sel.appendChild(el('option', '', x)); });
+    sel.value = inst.etat || '';
+    sel.addEventListener('change', function () { inst.etat = sel.value; sel.classList.remove('invalide'); modifie(); });
+    lab.appendChild(sel); d.appendChild(lab);
     if (supprimable) {
       var b = el('button', 'secondaire supprimer', 'Retirer cet équipement'); b.type = 'button';
       b.addEventListener('click', function () {
@@ -333,7 +385,7 @@
         if (inst) bloc.appendChild(detailsInstance(inst, false));
         c.appendChild(bloc);
       });
-      etat.instances.filter(function (x) { return x.type === t.id && !x.source; }).forEach(function (inst) {
+      etat.instances.filter(function (x) { return x.type === t.id && !t.equipements.some(function (e) { return e.id === x.source; }); }).forEach(function (inst) {
         var bloc = el('div', 'article'); bloc.appendChild(detailsInstance(inst, true)); c.appendChild(bloc);
       });
       var ajout = el('button', 'secondaire', 'Ajouter un équipement'); ajout.type = 'button';
@@ -361,8 +413,18 @@
         var compte = el('span', 'compte'); compte.id = 'compte-' + inst.uid;
         s.appendChild(titre); s.appendChild(compte); d.appendChild(s);
         operationsDe(inst).forEach(function (o, n) { d.appendChild(ligneOperation(inst, o.id, o.libelle, false, n === 0)); });
-        d.appendChild(ligneOperation(inst, 'libre1', 'Autre opération (facultatif)', true, false));
-        d.appendChild(ligneOperation(inst, 'libre2', 'Autre opération (facultatif)', true, false));
+        clesLibres(inst).forEach(function (k) { d.appendChild(ligneOperation(inst, k, 'Autre opération (facultatif)', true, false)); });
+        var ajout = el('button', 'secondaire ajout-ligne', 'Ajouter une opération'); ajout.type = 'button';
+        ajout.addEventListener('click', function () {
+          var cles = clesLibres(inst);
+          if (cles.length >= MAX_LIBRES) { message('erreur', 'Maximum ' + MAX_LIBRES + ' opérations ajoutées par équipement.'); return; }
+          var k = 'libre' + (Number(cles[cles.length - 1].slice(5)) + 1);
+          var ligne = ligneOperation(inst, k, 'Autre opération', true, false);
+          d.insertBefore(ligne, ajout);
+          ligne.querySelector('input').focus();
+          modifie();
+        });
+        d.appendChild(ajout);
         c.appendChild(d);
       });
     });
@@ -372,11 +434,17 @@
     var r = inst.operations[id] || (inst.operations[id] = { statut: '', remarque: '' });
     var div = el('div', 'operation' + (premier ? ' premier' : '')); div.id = 'ligne-' + inst.uid + '-' + id;
     var ligne = el('div', 'ligne-op');
-    var t;
+    var t, porteur = null;
     if (libre) {
       t = el('input', 'libre'); t.placeholder = libelle; t.maxLength = 200; t.value = r.libelle || '';
       t.setAttribute('aria-label', libelle);
       t.addEventListener('input', function () { r.libelle = t.value; t.classList.remove('invalide'); modifie(); });
+      if (Number(id.slice(5)) > 2) {
+        porteur = el('div', 'ligne-suppr'); porteur.appendChild(t);
+        var x = el('button', 'retirer', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Retirer cette opération');
+        x.addEventListener('click', function () { delete inst.operations[id]; div.remove(); modifie(); });
+        porteur.appendChild(x);
+      }
     } else { t = el('div', 'libelle', libelle); }
     var choix = el('div', 'choix'); choix.setAttribute('role', 'group'); choix.setAttribute('aria-label', libelle);
     var bf = bouton('Fait', 'fait'), bn = bouton('Non fait', 'non');
@@ -390,7 +458,7 @@
     bf.addEventListener('click', function () { choisir('fait'); });
     bn.addEventListener('click', function () { choisir('non_fait'); });
     rem.addEventListener('input', function () { r.remarque = rem.value; rem.classList.remove('invalide'); modifie(); });
-    choix.appendChild(bf); choix.appendChild(bn); ligne.appendChild(t); ligne.appendChild(choix);
+    choix.appendChild(bf); choix.appendChild(bn); ligne.appendChild(porteur || t); ligne.appendChild(choix);
     div.appendChild(ligne); div.appendChild(rem); maj();
     return div;
   }
@@ -426,7 +494,7 @@
     etat.instances.forEach(function (inst) {
       var fait = 0, nb = 0;
       operationsDe(inst).forEach(function (o) { nb += 1; if ((inst.operations[o.id] || {}).statut) fait += 1; });
-      ['libre1', 'libre2'].forEach(function (k) {
+      clesLibres(inst).forEach(function (k) {
         var r = inst.operations[k] || {};
         if ((r.libelle || '').trim()) { nb += 1; if (r.statut) fait += 1; }
       });
@@ -446,7 +514,7 @@
   function controler() {
     var e = [], premier = null;
     function marque(el2, texte) { el2.classList.add('invalide'); e.push(texte); premier = premier || el2; }
-    var requis = ['marche', 'societe', 'intervenants', 'charge_suivi', 'date', 'periodicite', 'heure_debut', 'heure_fin', 'annee', 'etat', 'resultat'];
+    var requis = ['marche', 'societe', 'intervenants', 'charge_suivi', 'date', 'periodicite', 'heure_debut', 'heure_fin', 'annee', 'resultat'];
     requis.forEach(function (c) {
       var x = $(c); x.classList.remove('invalide');
       if (!x.value.trim()) marque(x, x.parentNode.firstChild.textContent.trim() + ' : champ obligatoire');
@@ -457,6 +525,7 @@
     etat.instances.forEach(function (inst) {
       var nom = inst.designation || 'Équipement à préciser';
       if (!(inst.designation || '').trim()) { e.push('Désignation manquante : ' + typeDe(inst.type).titre); premier = premier || $('articles'); }
+      if (!inst.etat) marque($('etat-' + inst.uid), 'État fonctionnel manquant : ' + nom);
       function verifier(id, libelle) {
         var r = inst.operations[id], d = $('ligne-' + inst.uid + '-' + id);
         d.classList.remove('a-revoir');
@@ -465,7 +534,7 @@
         else if (r.statut === 'non_fait' && !(r.remarque || '').trim()) { marque(motif, 'Motif obligatoire : ' + nom + ' : ' + libelle); $('sec-' + inst.uid).open = true; }
       }
       operationsDe(inst).forEach(function (o) { verifier(o.id, o.libelle); });
-      ['libre1', 'libre2'].forEach(function (k) {
+      clesLibres(inst).forEach(function (k) {
         var r = inst.operations[k], l = (r.libelle || '').trim();
         if (l) verifier(k, l);
         else if (r.statut || (r.remarque || '').trim()) marque($('ligne-' + inst.uid + '-' + k).querySelector('input'), 'Opération à préciser : ' + nom);
@@ -477,7 +546,7 @@
 
   function bloquer(v, texte) {
     enCours = v;
-    $('btn-pdf').disabled = v; $('btn-imprimer').disabled = v;
+    $('btn-pdf').disabled = v; $('btn-imprimer').disabled = v; $('btn-excel').disabled = v;
     if (texte) $('etat-envoi').textContent = texte;
   }
 
@@ -495,7 +564,7 @@
       var r = await rep.json();
       if (r.acces === false) { garderCode(''); afficherAcces(); message('erreur', 'Mot de passe incorrect. Votre saisie reste sur cet appareil.'); return null; }
       if (!r.ok) { message('erreur', 'Rapport refusé', r.erreurs || []); return null; }
-      dernier = { cle: cle, reference: r.reference, html: r.html, pdf: r.pdf_base64 };
+      dernier = { cle: cle, reference: r.reference, html: r.html, pdf: r.pdf_base64, xlsx: r.xlsx_base64 };
       message('succes', 'Rapport ' + r.reference + ' enregistré au registre.');
       return dernier;
     } catch (err) {
@@ -506,11 +575,11 @@
     }
   }
 
-  function telecharger(r) {
-    var bin = atob(r.pdf), n = bin.length, tab = new Uint8Array(n);
+  function telecharger(contenu, type, nom) {
+    var bin = atob(contenu), n = bin.length, tab = new Uint8Array(n);
     for (var i = 0; i < n; i += 1) tab[i] = bin.charCodeAt(i);
-    var url = URL.createObjectURL(new Blob([tab], { type: 'application/pdf' }));
-    var a = document.createElement('a'); a.href = url; a.download = r.reference + '.pdf';
+    var url = URL.createObjectURL(new Blob([tab], { type: type }));
+    var a = document.createElement('a'); a.href = url; a.download = nom;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
   }
@@ -546,8 +615,125 @@
     rendre();
   }
 
+  /* Administration du modèle : réservée au rôle admin, vérifié aussi par le serveur */
+  function nouvelId(p) { compteurUid += 1; return p + Date.now().toString(36) + compteurUid; }
+  function champAdmin(texte, valeur, surSaisie, zone, large) {
+    var lab = el('label', 'champ' + (large ? ' large' : ''), texte);
+    var i = el(zone ? 'textarea' : 'input'); i.value = valeur || '';
+    i.addEventListener('input', function () { surSaisie(i.value); });
+    lab.appendChild(i); return lab;
+  }
+  function saisie1(ph, valeur, surSaisie) {
+    var i = el('input'); i.placeholder = ph; i.setAttribute('aria-label', ph); i.value = valeur || '';
+    i.addEventListener('input', function () { surSaisie(i.value); });
+    return i;
+  }
+  function boutonRetirer(texte, action) {
+    var b = el('button', 'retirer', '×'); b.type = 'button'; b.setAttribute('aria-label', texte);
+    b.addEventListener('click', action); return b;
+  }
+  function ligneAdminOp(t, o, liste) {
+    var d = el('div', 'adm-op');
+    d.appendChild(saisie1('Opération', o.libelle, function (v) { o.libelle = v; }));
+    var s = el('select'); s.setAttribute('aria-label', 'Périodicité');
+    modele.periodicites.forEach(function (p) { var x = el('option', '', p.libelle); x.value = p.rang; s.appendChild(x); });
+    s.value = o.rang;
+    s.addEventListener('change', function () { o.rang = Number(s.value); });
+    d.appendChild(s);
+    var up = el('button', 'retirer', '↑'); up.type = 'button'; up.setAttribute('aria-label', 'Monter cette opération');
+    up.addEventListener('click', function () {
+      var i = t.operations.indexOf(o); if (i < 1) return;
+      t.operations.splice(i, 1); t.operations.splice(i - 1, 0, o);
+      liste.insertBefore(d, d.previousSibling);
+    });
+    d.appendChild(up);
+    d.appendChild(boutonRetirer('Retirer cette opération', function () { t.operations.splice(t.operations.indexOf(o), 1); d.remove(); }));
+    return d;
+  }
+  function ligneAdminEq(t, e) {
+    var d = el('div', 'adm-eq');
+    d.appendChild(saisie1('Désignation', e.designation, function (v) { e.designation = v; }));
+    d.appendChild(saisie1('N° de série', e.serie, function (v) { e.serie = v; }));
+    d.appendChild(saisie1('Lieu', e.lieu, function (v) { e.lieu = v; }));
+    d.appendChild(boutonRetirer('Retirer cet équipement', function () { t.equipements.splice(t.equipements.indexOf(e), 1); d.remove(); }));
+    return d;
+  }
+  function blocType(t) {
+    var d = el('details', 'bloc');
+    var s = el('summary'); var titre = el('span', '', t.titre);
+    s.appendChild(titre); d.appendChild(s);
+    var rempli = false;
+    function remplir() {
+      if (rempli) return; rempli = true;
+      d.appendChild(champAdmin('Nom du sous-système', t.titre, function (v) { t.titre = v; titre.textContent = v || 'Sans nom'; }));
+      d.appendChild(el('h3', '', 'Opérations'));
+      var ops = el('div');
+      t.operations.forEach(function (o) { ops.appendChild(ligneAdminOp(t, o, ops)); });
+      d.appendChild(ops);
+      var a = el('button', 'secondaire', 'Ajouter une opération'); a.type = 'button';
+      a.addEventListener('click', function () {
+        var o = { id: nouvelId(t.id + '_o'), libelle: '', rang: 1 }; t.operations.push(o);
+        var l = ligneAdminOp(t, o, ops); ops.appendChild(l); l.querySelector('input').focus();
+      });
+      d.appendChild(a);
+      d.appendChild(el('h3', '', 'Équipements'));
+      var eqs = el('div');
+      t.equipements.forEach(function (e) { eqs.appendChild(ligneAdminEq(t, e)); });
+      d.appendChild(eqs);
+      var b = el('button', 'secondaire', 'Ajouter un équipement'); b.type = 'button';
+      b.addEventListener('click', function () {
+        var e = { id: nouvelId(t.id + '_e'), designation: '', serie: '', lieu: '' }; t.equipements.push(e);
+        var l = ligneAdminEq(t, e); eqs.appendChild(l); l.querySelector('input').focus();
+      });
+      d.appendChild(b);
+      var x = el('button', 'secondaire danger ajout-ligne', 'Supprimer ce sous-système'); x.type = 'button'; x.style.display = 'block';
+      x.addEventListener('click', function () {
+        if (!window.confirm('Supprimer ' + (t.titre || 'ce sous-système') + ' ?')) return;
+        adm.modele.types.splice(adm.modele.types.indexOf(t), 1); d.remove();
+      });
+      d.appendChild(x);
+    }
+    d.addEventListener('toggle', function () { if (d.open) remplir(); });
+    return d;
+  }
+  function lignes(v) { return v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); }
+  function ouvrirAdmin() {
+    adm = { modele: JSON.parse(JSON.stringify(modele)), notif: Object.assign({ actif: false, chat_id: '' }, notif || {}) };
+    var g = $('adm-general'); g.textContent = '';
+    g.appendChild(champAdmin('Titre du rapport', adm.modele.titre, function (v) { adm.modele.titre = v; }, false, true));
+    g.appendChild(champAdmin('Client', adm.modele.client, function (v) { adm.modele.client = v; }, false, true));
+    g.appendChild(champAdmin('Objet du contrat', adm.modele.objet_contrat, function (v) { adm.modele.objet_contrat = v; }, true, true));
+    g.appendChild(champAdmin('États fonctionnels (un par ligne)', adm.modele.etats.join('\n'), function (v) { adm.modele.etats = lignes(v); }, true));
+    g.appendChild(champAdmin("Résultats de l'intervention (un par ligne)", adm.modele.resultats.join('\n'), function (v) { adm.modele.resultats = lignes(v); }, true));
+    $('adm-notif').checked = adm.notif.actif; $('adm-chat').value = adm.notif.chat_id || '';
+    var c = $('adm-types'); c.textContent = '';
+    adm.modele.types.forEach(function (t) { c.appendChild(blocType(t)); });
+    $('form').hidden = true; $('barre').hidden = true; $('bandeau-admin').hidden = true; $('admin').hidden = false;
+    $('message').hidden = true; window.scrollTo(0, 0);
+  }
+  function fermerAdmin() {
+    adm = null; $('admin').hidden = true; $('form').hidden = false; $('barre').hidden = false; $('bandeau-admin').hidden = false;
+    window.scrollTo(0, 0);
+  }
+  async function enregistrerModele() {
+    adm.notif = { actif: $('adm-notif').checked, chat_id: $('adm-chat').value.trim() };
+    var b = $('adm-enregistrer'); b.disabled = true;
+    try {
+      var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: lireCode(), action: 'enregistrer_modele', rev: rev, modele: adm.modele, notif: adm.notif }) });
+      var r = await rep.json();
+      if (!r.ok) { message('erreur', 'Modèle non enregistré', r.erreurs || []); return; }
+      rev = r.rev; modele = adm.modele; notif = adm.notif; ecrire(CLE_MODELE, modele);
+      etat.types = etat.types.filter(function (id) { return typeDe(id); });
+      etat.instances = etat.instances.filter(function (i) { return typeDe(i.type); });
+      construire(); rendre(); invalider(); fermerAdmin();
+      message('succes', 'Modèle enregistré. Il s\'applique à tous les utilisateurs au prochain chargement de la page.');
+    } catch (e) {
+      message('erreur', 'Enregistrement impossible : vérifiez le réseau puis réessayez.');
+    } finally { b.disabled = false; }
+  }
+
   function afficherAcces() {
-    $('chargement').hidden = true; $('form').hidden = true; $('barre').hidden = true; $('acces').hidden = false;
+    $('chargement').hidden = true; $('form').hidden = true; $('barre').hidden = true; $('admin').hidden = true; $('bandeau-admin').hidden = true; $('acces').hidden = false;
     $('code').value = ''; $('code').focus();
   }
 
@@ -560,7 +746,8 @@
       var r = await rep.json();
       if (r.acces === false) { garderCode(''); afficherAcces(); message('erreur', 'Mot de passe incorrect.'); return; }
       if (!r.ok || !r.modele) throw new Error('modele');
-      modele = r.modele; ecrire(CLE_MODELE, modele);
+      modele = r.modele; role = r.role || 'technicien'; rev = r.rev; notif = r.notif || null; ecrire(CLE_MODELE, modele);
+      $('bandeau-admin').hidden = role !== 'admin';
     } catch (e) {
       modele = lire(CLE_MODELE);
       if (!modele) { afficherAcces(); message('erreur', 'Service indisponible : vérifiez le réseau puis réessayez.'); return; }
@@ -589,7 +776,22 @@
       if (!window.confirm('Effacer ce brouillon et commencer un nouveau rapport ?')) return;
       effacer(CLE_BROUILLON); window.location.reload();
     });
-    $('btn-pdf').addEventListener('click', async function () { if (enCours) return; var r = await obtenir(); if (r) telecharger(r); });
+    $('btn-pdf').addEventListener('click', async function () { if (enCours) return; var r = await obtenir(); if (r) telecharger(r.pdf, 'application/pdf', r.reference + '.pdf'); });
+    $('btn-excel').addEventListener('click', async function () {
+      if (enCours) return;
+      var r = await obtenir();
+      if (!r) return;
+      if (r.xlsx) telecharger(r.xlsx, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', r.reference + '.xlsx');
+      else message('erreur', "Le fichier Excel n'a pas pu être créé pour ce rapport. Le PDF reste disponible.");
+    });
+    $('btn-admin').addEventListener('click', ouvrirAdmin);
+    $('adm-fermer').addEventListener('click', fermerAdmin);
+    $('adm-enregistrer').addEventListener('click', enregistrerModele);
+    $('adm-ajout-type').addEventListener('click', function () {
+      var t = { id: nouvelId('t'), titre: 'Nouveau sous-système', operations: [], equipements: [] };
+      adm.modele.types.push(t);
+      var d = blocType(t); d.open = true; $('adm-types').appendChild(d);
+    });
     $('btn-imprimer').addEventListener('click', async function () { if (enCours) return; var r = await obtenir(); if (r) imprimer(r); });
   }
 
