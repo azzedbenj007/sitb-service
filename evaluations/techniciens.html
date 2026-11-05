@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Évaluation des techniciens | SITB</title>
+<style>
+  :root { --fond:#f3f6fb; --panneau:#fff; --bord:#c9d5e4; --texte:#16243a; --doux:#55647a; --bleu:#1565d8; --bleu-fort:#1258c0; --vert:#157a4f; --rouge:#c8303a; --orange:#b35c00; }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  html { -webkit-text-size-adjust:100%; }
+  body { margin:0; background:var(--fond); color:var(--texte); font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; padding-bottom:40px; }
+  header { padding:22px 16px 14px; max-width:860px; margin:0 auto; }
+  .surtitre { color:var(--bleu-fort); font-size:13px; font-weight:600; letter-spacing:.04em; }
+  h1 { font-size:24px; line-height:1.2; margin:4px 0 6px; }
+  header p { margin:0; color:var(--doux); font-size:15px; }
+  main { max-width:860px; margin:0 auto; padding:0 16px; }
+  section { background:var(--panneau); border:1px solid var(--bord); border-radius:10px; padding:16px; margin-bottom:14px; }
+  h2 { font-size:17px; margin:0 0 12px; } h3 { font-size:15px; margin:16px 0 8px; color:var(--bleu-fort); }
+  .aide { color:var(--doux); font-size:14px; margin:0 0 12px; }
+  label.champ { display:block; font-size:14px; color:var(--doux); margin-bottom:12px; }
+  input,select,textarea { width:100%; margin-top:4px; min-height:44px; padding:9px 10px; background:#fff; color:var(--texte); border:1px solid var(--bord); border-radius:7px; font:inherit; color-scheme:light; }
+  textarea { min-height:96px; resize:vertical; }
+  input:focus,select:focus,textarea:focus,button:focus-visible { outline:2px solid var(--bleu); outline-offset:1px; }
+  button { font:inherit; cursor:pointer; }
+  .principal { width:100%; min-height:48px; border:1px solid var(--bleu); border-radius:7px; background:var(--bleu); color:#fff; font-weight:700; }
+  .secondaire { min-height:44px; padding:0 14px; border:1px solid var(--bord); border-radius:7px; background:transparent; color:var(--bleu-fort); font-weight:600; }
+  .danger { color:var(--rouge); border-color:var(--rouge); }
+  button:disabled { opacity:.55; cursor:wait; }
+  .ligne { display:flex; gap:10px; flex-wrap:wrap; align-items:center; } .ligne > * { flex:0 0 auto; } .ligne .pousse { flex:1 1 160px; }
+  .grille { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 12px; }
+  #message { padding:12px 14px; border-radius:8px; border:1px solid var(--bord); background:var(--panneau); font-size:15px; margin-bottom:14px; }
+  #message.erreur { border-color:var(--rouge); color:var(--rouge); } #message.succes { border-color:var(--vert); color:var(--vert); }
+  #message ul { margin:6px 0 0; padding-left:20px; }
+  .chiffres { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
+  .chiffre { border:1px solid var(--bord); border-radius:8px; padding:10px; text-align:center; } .chiffre b { display:block; font-size:22px; } .chiffre span { color:var(--doux); font-size:13px; }
+  #barre { position:sticky; top:0; z-index:5; background:var(--fond); padding:10px 0 8px; }
+  .avancement { display:flex; justify-content:space-between; gap:12px; font-size:14px; color:var(--doux); margin-bottom:6px; }
+  #chrono { font-weight:700; color:var(--texte); font-variant-numeric:tabular-nums; } #chrono.bas { color:var(--rouge); }
+  .jauge { height:6px; background:var(--bord); border-radius:3px; overflow:hidden; } .jauge div { height:100%; width:0; background:var(--bleu); transition:width .15s; }
+  #q-texte { font-size:17px; font-weight:600; margin:0 0 6px; } #q-type { color:var(--doux); font-size:14px; margin:0 0 12px; }
+  .choix { display:flex; gap:10px; align-items:center; min-height:48px; padding:10px 12px; border:1px solid var(--bord); border-radius:7px; margin-bottom:8px; background:#fff; }
+  .choix input { width:22px; height:22px; min-height:0; margin:0; flex:none; accent-color:var(--bleu); }
+  .choix.coche { border-color:var(--bleu); background:#eaf2fe; }
+  .nav { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px; } .nav button { min-height:48px; }
+  #etat-sauve { font-size:14px; color:var(--doux); min-height:21px; margin-top:8px; } #etat-sauve.alerte { color:var(--orange); }
+  .pastilles { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+  .pastilles button { width:44px; height:44px; border:1px solid var(--bord); border-radius:7px; background:#fff; color:var(--doux); }
+  .pastilles button.fait { background:#eaf2fe; border-color:var(--bleu); color:var(--bleu-fort); font-weight:700; }
+  .tableau { overflow-x:auto; } table { width:100%; border-collapse:collapse; font-size:14px; } th,td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--bord); vertical-align:top; } th { color:var(--doux); font-weight:600; }
+  .onglets { display:flex; gap:6px; overflow-x:auto; margin-bottom:14px; padding-bottom:2px; } .onglets button { flex:none; min-height:44px; padding:0 12px; border:1px solid var(--bord); border-radius:7px; background:#fff; color:var(--doux); font-weight:600; } .onglets button[aria-selected="true"] { background:var(--bleu); border-color:var(--bleu); color:#fff; }
+  .carte { border:1px solid var(--bord); border-radius:8px; padding:12px; margin-bottom:10px; } .carte p { margin:0 0 6px; } .petit { color:var(--doux); font-size:14px; }
+  .code { font:600 17px ui-monospace,Menlo,Consolas,monospace; letter-spacing:.04em; }
+  .brouillon { color:var(--orange); font-weight:600; } .valide { color:var(--vert); font-weight:600; }
+  .reponse-ligne { display:grid; grid-template-columns:44px minmax(0,1fr) 44px; gap:8px; align-items:center; margin-bottom:8px; } .reponse-ligne input[type=text] { margin:0; } .reponse-ligne input[type=checkbox] { width:22px; height:22px; min-height:0; margin:auto; }
+  .case { display:flex; gap:9px; align-items:center; min-height:44px; } .case input { width:20px; height:20px; min-height:0; margin:0; flex:none; }
+  .bas-page { text-align:center; margin-top:18px; }
+  @media (max-width:620px) { .grille { grid-template-columns:minmax(0,1fr); } h1 { font-size:22px; } .ligne .secondaire { flex:1 1 auto; } }
+  @media print { header,.onglets,button { display:none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="surtitre">SITB · Contrats de maintenance</div>
+  <h1 id="titre">Évaluation des techniciens</h1>
+  <p id="sous-titre">Saisissez les informations reçues du superviseur.</p>
+</header>
+<main>
+  <div id="message" role="status" aria-live="polite" hidden></div>
+
+  <section id="e-acces">
+    <h2>Accès</h2>
+    <form id="f-acces" novalidate>
+      <label class="champ">Code d'accès<input id="a-code" autocomplete="off" autocapitalize="characters" required></label>
+      <label class="champ">Nom complet<input id="a-nom" autocomplete="name" required></label>
+      <label class="champ">Contrat<select id="a-contrat" required><option value="">Chargement…</option></select></label>
+      <label class="champ">Société<input id="a-societe" list="l-societes" autocomplete="organization" required><datalist id="l-societes"></datalist></label>
+      <button class="principal" id="b-acces" type="submit">Continuer</button>
+    </form>
+  </section>
+
+  <section id="e-consignes" hidden>
+    <h2 id="c-titre"></h2>
+    <div class="chiffres">
+      <div class="chiffre"><b id="c-nb"></b><span>questions</span></div>
+      <div class="chiffre"><b id="c-duree"></b><span>minutes</span></div>
+      <div class="chiffre"><b id="c-seuil"></b><span>pour réussir</span></div>
+    </div>
+    <ul class="aide">
+      <li>Le temps démarre quand vous appuyez sur Commencer et ne s'arrête pas, même en cas de coupure.</li>
+      <li>Chaque réponse est enregistrée. En cas de coupure, revenez sur cette page pour reprendre.</li>
+      <li>Une erreur sur une question de sécurité entraîne le statut « à revoir ».</li>
+      <li>Vous n'avez droit qu'à une seule tentative.</li>
+    </ul>
+    <button class="principal" id="b-commencer" type="button">Commencer</button>
+  </section>
+
+  <div id="e-quiz" hidden>
+    <div id="barre">
+      <div class="avancement"><span id="q-rang"></span><span id="chrono" aria-live="off"></span></div>
+      <div class="jauge"><div id="q-jauge"></div></div>
+    </div>
+    <section>
+      <p id="q-texte"></p><p id="q-type"></p>
+      <div id="q-reponses"></div>
+      <div id="etat-sauve" role="status"></div>
+      <div class="nav"><button class="secondaire" id="b-prec" type="button">Précédente</button><button class="principal" id="b-suiv" type="button">Suivante</button></div>
+    </section>
+  </div>
+
+  <section id="e-revue" hidden>
+    <h2>Vérifiez avant de valider</h2>
+    <p class="aide" id="r-resume"></p>
+    <div class="pastilles" id="r-pastilles"></div>
+    <div class="nav"><button class="secondaire" id="b-retour" type="button">Revenir aux questions</button><button class="principal" id="b-valider" type="button">Valider mes réponses</button></div>
+    <div id="r-confirme" hidden><p><strong>Confirmez-vous ? Vous ne pourrez plus modifier vos réponses.</strong></p><div class="nav"><button class="secondaire" id="b-non" type="button">Annuler</button><button class="principal" id="b-oui" type="button">Oui, valider</button></div></div>
+  </section>
+
+  <section id="e-fin" hidden>
+    <h2 id="f-titre">Évaluation terminée</h2>
+    <div id="f-score" hidden>
+      <div class="chiffres"><div class="chiffre"><b id="f-pct"></b><span id="f-pct-l">score</span></div><div class="chiffre" style="grid-column:span 2"><b id="f-statut" style="font-size:18px"></b><span>statut</span></div></div>
+      <div class="tableau"><table><thead><tr><th>Thème</th><th>Points</th></tr></thead><tbody id="f-themes"></tbody></table></div>
+    </div>
+    <p class="aide" id="f-note"></p>
+    <p class="petit">Référence : <strong id="f-ref"></strong></p>
+  </section>
+
+  <div id="e-admin" hidden>
+    <div class="onglets" role="tablist" id="onglets"></div>
+    <div id="a-vue"></div>
+  </div>
+  <p class="bas-page" id="lien-admin"><button class="secondaire" id="b-admin" type="button">Administration</button></p>
+
+  <section id="e-admin-acces" hidden>
+    <h2>Administration</h2>
+    <form id="f-admin"><label class="champ">Code administrateur<input id="ad-code" type="password" autocomplete="off"></label><button class="principal" id="b-ad" type="submit">Entrer</button></form>
+  </section>
+</main>
+<script>
+(function () {
+  'use strict';
+  var BASE = 'https://n8n.srv881398.hstgr.cloud/webhook/evaluation-techniciens';
+  var CLE = 'sitb_eval_session', CLE_AD = 'sitb_eval_admin';
+  var $ = function (i) { return document.getElementById(i); };
+  var ecrans = ['e-acces', 'e-consignes', 'e-quiz', 'e-revue', 'e-fin', 'e-admin', 'e-admin-acces'];
+  var S = null, rang = 0, finLocale = 0, minuteur = null, envoi = Promise.resolve(), attente = {}, contrats = [], auth = null;
+  function lire(c, st) { try { return JSON.parse((st || localStorage).getItem(c)); } catch (e) { return null; } }
+  function ecrire(c, v, st) { try { (st || localStorage).setItem(c, JSON.stringify(v)); } catch (e) {} }
+  function effacer(c, st) { try { (st || localStorage).removeItem(c); } catch (e) {} }
+  function el(t, a, kids) { var n = document.createElement(t); Object.keys(a || {}).forEach(function (k) { if (k === 'texte') n.textContent = a[k]; else if (k === 'clic') n.addEventListener('click', a[k]); else if (k in n && k !== 'list') n[k] = a[k]; else n.setAttribute(k, a[k]); }); (kids || []).forEach(function (x) { if (x) n.appendChild(x); }); return n; }
+  function montrer(id) { ecrans.forEach(function (e) { $(e).hidden = e !== id; }); $('lien-admin').hidden = id !== 'e-acces'; window.scrollTo(0, 0); }
+  function info(t, type, details) { var m = $('message'); m.hidden = !t; m.className = type || ''; m.textContent = t || ''; if (details && details.length) m.appendChild(el('ul', {}, details.map(function (d) { return el('li', { texte: d }); }))); }
+  async function api(corps, essais) {
+    for (var i = 0; i < (essais || 1); i++) {
+      var ctrl = new AbortController(), t = setTimeout(function () { ctrl.abort(); }, 45000);
+      try {
+        var r = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps), signal: ctrl.signal });
+        clearTimeout(t); var j = await r.json(); return j;
+      } catch (e) { clearTimeout(t); if (i + 1 >= (essais || 1)) throw e; await new Promise(function (ok) { setTimeout(ok, 1500); }); }
+    }
+  }
+  /* Accès */
+  async function chargerContrats() {
+    try { var r = await api({ action: 'contrats' }, 2); contrats = r.contrats || []; var s = $('a-contrat'); s.textContent = ''; s.appendChild(el('option', { value: '', texte: contrats.length ? 'Choisissez un contrat' : 'Aucune évaluation ouverte' })); contrats.forEach(function (c) { s.appendChild(el('option', { value: c.id, texte: c.titre })); }); }
+    catch (e) { info('Service indisponible. Vérifiez votre connexion puis rechargez la page.', 'erreur'); }
+  }
+  $('a-contrat').addEventListener('change', function () { var c = contrats.filter(function (x) { return x.id === $('a-contrat').value; })[0], d = $('l-societes'); d.textContent = ''; (c ? c.societes : []).forEach(function (x) { d.appendChild(el('option', { value: x })); }); });
+  function ident() { return { code: $('a-code').value.trim(), nom: $('a-nom').value.trim(), contrat: $('a-contrat').value, societe: $('a-societe').value.trim() }; }
+  $('f-acces').addEventListener('submit', async function (ev) {
+    ev.preventDefault(); var d = ident(); if (!d.code || !d.nom || !d.contrat || !d.societe) return info('Remplissez tous les champs.', 'erreur');
+    var b = $('b-acces'); b.disabled = true; info('');
+    try { var r = await api(Object.assign({ action: 'ouvrir' }, d), 2); if (r.termine) return fin(r); if (!r.ok) return info(r.erreur, 'erreur'); $('c-titre').textContent = r.titre; $('c-nb').textContent = r.nb; $('c-duree').textContent = r.duree_min; $('c-seuil').textContent = r.seuil + ' %'; $('b-commencer').textContent = r.reprise ? 'Reprendre' : 'Commencer'; if (r.reprise) info('Une tentative est en cours : le temps restant continue de courir.'); montrer('e-consignes'); }
+    catch (e) { info('Connexion impossible. Réessayez.', 'erreur'); } finally { b.disabled = false; }
+  });
+  $('b-commencer').addEventListener('click', async function () {
+    var b = this; b.disabled = true; info('');
+    try { var r = await api(Object.assign({ action: 'demarrer' }, ident()), 3); if (r.termine) return fin(r); if (!r.ok) { info(r.erreur, 'erreur'); return montrer('e-acces'); } $('a-code').value = ''; lancer(r); }
+    catch (e) { info('Connexion impossible. Réessayez : le temps n’a pas démarré si aucune question ne s’affiche.', 'erreur'); } finally { b.disabled = false; }
+  });
+  /* Questionnaire */
+  function lancer(r) {
+    S = { token: r.token, reference: r.reference, questions: r.questions, reponses: r.reponses || {} }; var loc = lire(CLE); attente = loc && loc.token === r.token && loc.attente ? loc.attente : {};
+    Object.keys(attente).forEach(function (k) { S.reponses[k] = attente[k]; }); garder(); $('titre').textContent = r.titre; $('sous-titre').textContent = 'Référence ' + r.reference; recale(r.restant_s); rang = Math.min(premierVide(), S.questions.length - 1); afficher(); montrer('e-quiz'); clearInterval(minuteur); minuteur = setInterval(tic, 1000); tic(); vider();
+  }
+  function garder() { ecrire(CLE, { token: S.token, attente: attente }); }
+  function recale(s) { finLocale = Date.now() + s * 1000; }
+  function premierVide() { for (var i = 0; i < S.questions.length; i++) if (!repondu(S.questions[i])) return i; return 0; }
+  function repondu(q) { var r = S.reponses[q.id]; return Array.isArray(r) ? r.length > 0 : r != null && String(r).trim() !== ''; }
+  function tic() { var s = Math.max(0, Math.round((finLocale - Date.now()) / 1000)), c = $('chrono'); c.textContent = Math.floor(s / 60) + ' min ' + ('0' + s % 60).slice(-2); c.className = s <= 120 ? 'bas' : ''; if (s <= 0) { clearInterval(minuteur); soumettre(true); } }
+  function afficher() {
+    var q = S.questions[rang], n = S.questions.length; $('q-rang').textContent = 'Question ' + (rang + 1) + ' sur ' + n; $('q-jauge').style.width = ((rang + 1) / n * 100) + '%'; $('q-texte').textContent = q.texte;
+    $('q-type').textContent = q.type === 'qcmn' ? 'Plusieurs réponses possibles.' : q.type === 'ouverte' ? 'Réponse courte, corrigée par le superviseur.' : 'Une seule réponse.';
+    var z = $('q-reponses'); z.textContent = '';
+    if (q.type === 'ouverte') { var t = el('textarea', { maxLength: 600, value: S.reponses[q.id] || '', 'aria-label': 'Votre réponse' }); var d; t.addEventListener('input', function () { clearTimeout(d); S.reponses[q.id] = t.value; d = setTimeout(function () { poser(q.id, t.value); }, 800); }); t.addEventListener('blur', function () { clearTimeout(d); if ((S.reponses[q.id] || '') === t.value) poser(q.id, t.value); }); z.appendChild(t); }
+    else q.options.forEach(function (o) {
+      var multi = q.type === 'qcmn', val = S.reponses[q.id], pris = multi ? (val || []).indexOf(o.i) >= 0 : val === o.i, inp = el('input', { type: multi ? 'checkbox' : 'radio', name: 'rep', checked: pris }), lab = el('label', { className: 'choix' + (pris ? ' coche' : '') }, [inp, el('span', { texte: o.t })]);
+      inp.addEventListener('change', function () { if (multi) { var l = (S.reponses[q.id] || []).filter(function (x) { return x !== o.i; }); if (inp.checked) l.push(o.i); S.reponses[q.id] = l; } else S.reponses[q.id] = o.i; afficher(); poser(q.id, S.reponses[q.id]); }); z.appendChild(lab);
+    });
+    $('b-prec').disabled = rang === 0; $('b-suiv').textContent = rang === n - 1 ? 'Terminer' : 'Suivante';
+  }
+  function poser(id, v) { attente[id] = v; garder(); vider(); }
+  function etat(t, al) { var e = $('etat-sauve'); e.textContent = t; e.className = al ? 'alerte' : ''; }
+  var vidage = false;
+  async function vider() {
+    if (vidage || !S) return; vidage = true;
+    try { for (;;) { var k = Object.keys(attente)[0]; if (!k) break; var v = attente[k]; etat('Enregistrement…'); var r = await api({ action: 'repondre', token: S.token, question: k, valeur: v }, 2); if (r.termine) return fin(r); if (!r.ok) { delete attente[k]; garder(); etat(r.erreur, true); continue; } if (attente[k] === v) delete attente[k]; garder(); recale(r.restant_s); etat('Réponse enregistrée.'); } }
+    catch (e) { etat('Connexion perdue : vos réponses seront envoyées dès son retour.', true); setTimeout(function () { vider(); }, 5000); }
+    finally { vidage = false; }
+  }
+  window.addEventListener('online', function () { vider(); });
+  $('b-prec').addEventListener('click', function () { if (rang > 0) { rang--; afficher(); window.scrollTo(0, 0); } });
+  $('b-suiv').addEventListener('click', function () { if (rang < S.questions.length - 1) { rang++; afficher(); window.scrollTo(0, 0); } else revue(); });
+  function revue() {
+    var vides = S.questions.filter(function (q) { return !repondu(q); }).length; $('r-resume').textContent = vides ? vides + ' question(s) sans réponse. Une question sans réponse rapporte 0 point.' : 'Toutes les questions ont une réponse.'; var z = $('r-pastilles'); z.textContent = '';
+    S.questions.forEach(function (q, i) { z.appendChild(el('button', { type: 'button', texte: i + 1, className: repondu(q) ? 'fait' : '', 'aria-label': 'Question ' + (i + 1), clic: function () { rang = i; afficher(); montrer('e-quiz'); } })); }); $('r-confirme').hidden = true; montrer('e-revue');
+    ['b-valider', 'b-retour'].forEach(function (i) { $(i).hidden = false; });
+    $('e-quiz').hidden = true;
+  }
+  $('b-retour').addEventListener('click', function () { montrer('e-quiz'); });
+  $('b-valider').addEventListener('click', function () { $('r-confirme').hidden = false; this.hidden = true; $('b-retour').hidden = true; });
+  $('b-non').addEventListener('click', revue);
+  $('b-oui').addEventListener('click', function () { soumettre(false); });
+  async function soumettre(auto) {
+    if (!S || soumettre.encours) return; soumettre.encours = true; clearInterval(minuteur); var b = $('b-oui'); b.disabled = true; info(auto ? 'Temps écoulé : envoi de vos réponses…' : 'Envoi…');
+    try { var r = await api({ action: 'soumettre', token: S.token, reponses: S.reponses }, 4); if (!r.ok) { info(r.erreur, 'erreur'); return; } fin(r); }
+    catch (e) { info('Connexion perdue. Revenez sur cette page dès son retour : le serveur retiendra les réponses enregistrées avant la fin du temps.', 'erreur'); }
+    finally { soumettre.encours = false; b.disabled = false; }
+  }
+  function fin(r) {
+    clearInterval(minuteur); effacer(CLE); S = null; info(''); $('titre').textContent = 'Évaluation des techniciens'; $('sous-titre').textContent = ''; $('f-ref').textContent = r.reference || ''; $('f-score').hidden = !r.afficher;
+    if (r.afficher) { $('f-pct').textContent = String(r.score).replace('.', ',') + ' %'; $('f-pct-l').textContent = r.provisoire ? 'score provisoire' : 'score'; $('f-statut').textContent = r.statut; var t = $('f-themes'); t.textContent = ''; Object.keys(r.themes || {}).forEach(function (k) { t.appendChild(el('tr', {}, [el('td', { texte: k }), el('td', { texte: r.themes[k].pts + ' / ' + r.themes[k].max })])); }); }
+    $('f-note').textContent = r.hors_temps ? 'Le temps était écoulé : seules les réponses enregistrées à temps ont été comptées.' : r.afficher ? (r.provisoire ? 'Le résultat sera définitif après la correction des questions ouvertes.' : '') : 'Vos réponses sont enregistrées. Le superviseur vous communiquera le résultat.'; montrer('e-fin');
+  }
+  /* Administration */
+  $('b-admin').addEventListener('click', function () { info(''); montrer('e-admin-acces'); $('ad-code').focus(); });
+  $('f-admin').addEventListener('submit', async function (e) { e.preventDefault(); var c = $('ad-code').value.trim(); if (!c) return; ecrire(CLE_AD, c, sessionStorage); $('ad-code').value = ''; await etatAdmin(); });
+  var A = null, onglet = 'Résultats', copie = null;
+  async function adm(c) { c.code = lire(CLE_AD, sessionStorage); return api(c, 1); }
+  async function etatAdmin(msg) {
+    info('Chargement…'); try { var r = await adm({ action: 'admin_etat' }); if (!r.ok) { effacer(CLE_AD, sessionStorage); info(r.erreur, 'erreur'); montrer('e-admin-acces'); return; } A = r; copie = null; info(msg || '', msg ? 'succes' : ''); $('titre').textContent = 'Administration des évaluations'; $('sous-titre').textContent = ''; montrer('e-admin'); vueAdmin(); }
+    catch (e) { info('Connexion impossible.', 'erreur'); }
+  }
+  async function act(c, msg) { var r; try { r = await adm(c); } catch (e) { return info('Connexion impossible.', 'erreur'); } if (!r.ok) { info(r.erreur, 'erreur', r.details); window.scrollTo(0, 0); return null; } await etatAdmin(msg); return r; }
+  function vueAdmin() {
+    var o = $('onglets'); o.textContent = ''; var aC = A.sessions.filter(function (s) { return s.statut === 'a_corriger'; }).length;
+    [['Résultats', 'Résultats'], ['Corrections', 'Corrections' + (aC ? ' (' + aC + ')' : '')], ['Codes', 'Codes'], ['Évaluations', 'Évaluations'], ['Questions', 'Questions']].forEach(function (x) { o.appendChild(el('button', { type: 'button', role: 'tab', texte: x[1], 'aria-selected': String(onglet === x[0]), clic: function () { onglet = x[0]; info(''); vueAdmin(); } })); });
+    var v = $('a-vue'); v.textContent = ''; ({ 'Résultats': vResultats, 'Corrections': vCorr, 'Codes': vCodes, 'Évaluations': vEval, 'Questions': vQuest })[onglet](v);
+  }
+  function tab(entetes, lignes) { return el('div', { className: 'tableau' }, [el('table', {}, [el('thead', {}, [el('tr', {}, entetes.map(function (h) { return el('th', { texte: h }); }))]), el('tbody', {}, lignes.map(function (l) { return el('tr', {}, l.map(function (c) { return c instanceof Node ? el('td', {}, [c]) : el('td', { texte: c == null ? '' : c }); })); }))])]); }
+  var titreC = function (id) { var c = (A.config.contrats || []).filter(function (x) { return x.id === id; })[0]; return c ? c.titre : id; };
+  function vResultats(v) {
+    var fs = el('select', { 'aria-label': 'Société' }), fc = el('select', { 'aria-label': 'Contrat' }), z = el('div');
+    fs.appendChild(el('option', { value: '', texte: 'Toutes les sociétés' })); uniq(A.sessions.map(function (s) { return s.societe; })).forEach(function (x) { fs.appendChild(el('option', { value: x, texte: x })); });
+    fc.appendChild(el('option', { value: '', texte: 'Tous les contrats' })); uniq(A.sessions.map(function (s) { return s.contrat; })).forEach(function (x) { fc.appendChild(el('option', { value: x, texte: titreC(x) })); });
+    function maj() {
+      var l = A.sessions.filter(function (s) { return (!fs.value || s.societe === fs.value) && (!fc.value || s.contrat === fc.value); }), f = l.filter(function (s) { return s.score != null; }); z.textContent = '';
+      z.appendChild(el('div', { className: 'chiffres' }, [ch(l.length, 'tentatives'), ch(f.length ? String(Math.round(f.reduce(function (a, s) { return a + s.score; }, 0) / f.length * 10) / 10).replace('.', ',') + ' %' : '—', 'score moyen'), ch(f.reduce(function (a, s) { return a + (s.secu ? 1 : 0); }, 0), 'avec erreur de sécurité')]));
+      z.appendChild(el('h3', { texte: 'Par technicien' })); z.appendChild(tab(['Technicien', 'Société', 'Date', 'Score', 'Statut', 'Attestation'], l.map(function (s) { return [s.technicien, s.societe, new Date(s.debut).toLocaleDateString('fr-FR'), s.score == null ? '—' : String(s.score).replace('.', ',') + ' %', s.resultat, s.attestation ? el('a', { href: s.attestation, target: '_blank', rel: 'noopener', texte: 'PDF' }) : '—']; })));
+      z.appendChild(el('h3', { texte: 'Par société' })); z.appendChild(tab(['Société', 'Tentatives', 'Score moyen'], uniq(f.map(function (s) { return s.societe; })).map(function (x) { var g = f.filter(function (s) { return s.societe === x; }); return [x, g.length, String(Math.round(g.reduce(function (a, s) { return a + s.score; }, 0) / g.length * 10) / 10).replace('.', ',') + ' %']; })));
+      var th = {}; f.forEach(function (s) { Object.keys(s.themes || {}).forEach(function (k) { th[k] = th[k] || { p: 0, m: 0 }; th[k].p += s.themes[k].pts; th[k].m += s.themes[k].max; }); }); z.appendChild(el('h3', { texte: 'Par thème' })); z.appendChild(tab(['Thème', 'Réussite'], Object.keys(th).sort(function (a, b) { return th[a].p / th[a].m - th[b].p / th[b].m; }).map(function (k) { return [k, Math.round(th[k].p / th[k].m * 100) + ' %']; })));
+    }
+    fs.addEventListener('change', maj); fc.addEventListener('change', maj); v.appendChild(el('section', {}, [el('h2', { texte: 'Résultats' }), el('div', { className: 'grille' }, [fs, fc]), z])); maj();
+  }
+  function ch(a, b) { return el('div', { className: 'chiffre' }, [el('b', { texte: a }), el('span', { texte: b })]); }
+  function uniq(l) { return l.filter(function (x, i) { return x && l.indexOf(x) === i; }); }
+  function vCorr(v) {
+    var l = A.sessions.filter(function (s) { return s.statut === 'a_corriger'; }), sec = el('section', {}, [el('h2', { texte: 'Questions ouvertes à corriger' })]); if (!l.length) sec.appendChild(el('p', { className: 'aide', texte: 'Aucune correction en attente.' }));
+    l.forEach(function (s) { var ins = {}, c = el('div', { className: 'carte' }, [el('p', {}, [el('strong', { texte: s.technicien + ' — ' + s.societe })]), el('p', { className: 'petit', texte: s.reference })]);
+      s.ouvertes.forEach(function (q) { var i = el('input', { type: 'number', min: 0, max: q.points, step: 0.5, value: q.note == null ? '' : q.note, 'aria-label': 'Note' }); ins[q.id] = i; c.appendChild(el('p', {}, [el('strong', { texte: q.texte })])); c.appendChild(el('p', { texte: 'Réponse : ' + (q.reponse || '(vide)') })); c.appendChild(el('p', { className: 'petit', texte: 'Corrigé : ' + q.guide })); c.appendChild(el('label', { className: 'champ', texte: 'Note sur ' + q.points }, [i])); });
+      c.appendChild(el('button', { className: 'principal', type: 'button', texte: 'Enregistrer la correction', clic: function () { var n = {}; for (var k in ins) { if (ins[k].value === '') return info('Notez toutes les questions de ce technicien.', 'erreur'); n[k] = Number(ins[k].value); } act({ action: 'admin_corriger', reference: s.reference, notes: n }, 'Correction enregistrée.'); } })); sec.appendChild(c); }); v.appendChild(sec);
+  }
+  function selEval() { var s = el('select', { 'aria-label': 'Évaluation' }); (A.config.evaluations || []).forEach(function (e) { s.appendChild(el('option', { value: e.id, texte: e.titre })); }); return s; }
+  function vCodes(v) {
+    var s = selEval(), t = el('textarea', { placeholder: 'Un technicien par ligne : Nom complet ; Société', 'aria-label': 'Techniciens' }), z = el('div');
+    v.appendChild(el('section', {}, [el('h2', { texte: 'Créer des codes individuels' }), el('p', { className: 'aide', texte: 'Chaque code ne sert qu’à un technicien. Il ne s’affiche qu’une seule fois : notez-le ou copiez la liste.' }), s, t, el('p', {}), el('button', { className: 'principal', type: 'button', texte: 'Créer les codes', clic: async function () { var lignes = t.value.split('\n').map(function (l) { var p = l.split(';'); return { nom: (p[0] || '').trim(), societe: (p[1] || '').trim() }; }).filter(function (x) { return x.nom; }); if (lignes.some(function (x) { return !x.societe; })) return info('Indiquez le nom et la société sur chaque ligne.', 'erreur'); var r; try { r = await adm({ action: 'admin_codes', evaluation: s.value, lignes: lignes }); } catch (e) { return info('Connexion impossible.', 'erreur'); } if (!r.ok) return info(r.erreur, 'erreur'); t.value = ''; var texte = r.codes.map(function (c) { return c.nom + ' ; ' + c.societe + ' ; ' + c.code; }).join('\n'); z.textContent = ''; z.appendChild(el('h3', { texte: 'Codes créés' })); r.codes.forEach(function (c) { z.appendChild(el('div', { className: 'carte' }, [el('p', { texte: c.nom + ' — ' + c.societe }), el('p', { className: 'code', texte: c.code })])); }); z.appendChild(el('button', { className: 'secondaire', type: 'button', texte: 'Copier la liste', clic: function () { if (navigator.clipboard) navigator.clipboard.writeText(texte); } })); info('Codes créés.', 'succes'); } }), z]));
+    var f = el('section', {}, [el('h2', { texte: 'Codes existants' })]); if (!A.codes.length) f.appendChild(el('p', { className: 'aide', texte: 'Aucun code.' }));
+    if (A.codes.length) f.appendChild(tab(['Technicien', 'Société', 'État', 'Tentative', ''], A.codes.map(function (c) { var b = el('div', { className: 'ligne' }); if (c.statut === 'utilise') b.appendChild(el('button', { className: 'secondaire', type: 'button', texte: 'Autoriser une nouvelle tentative', clic: function () { act({ action: 'admin_tentative', ref: c.ref }, 'Nouvelle tentative autorisée.'); } })); if (c.statut === 'actif') b.appendChild(el('button', { className: 'secondaire danger', type: 'button', texte: 'Annuler', clic: function () { act({ action: 'admin_code_annuler', ref: c.ref }, 'Code annulé.'); } })); return [c.technicien, c.societe, { actif: 'Disponible', utilise: 'Utilisé', annule: 'Annulé' }[c.statut] || c.statut, c.tentative, b]; }))); v.appendChild(f);
+  }
+  function vEval(v) {
+    var C = JSON.parse(JSON.stringify(A.config)), sc = el('section', {}, [el('h2', { texte: 'Contrats' })]), se = el('section', {}, [el('h2', { texte: 'Évaluations' })]);
+    function ch2(o, k, lab, type, attrs) { var i = el('input', Object.assign({ type: type || 'text', value: o[k] == null ? '' : o[k] }, attrs || {})); i.addEventListener('input', function () { o[k] = type === 'number' ? Number(i.value) : i.value; }); return el('label', { className: 'champ', texte: lab }, [i]); }
+    function casee(o, k, lab) { var i = el('input', { type: 'checkbox', checked: !!o[k] }); i.addEventListener('change', function () { o[k] = i.checked; }); return el('label', { className: 'case' }, [i, el('span', { texte: lab })]); }
+    function rendre() {
+      sc.textContent = ''; sc.appendChild(el('h2', { texte: 'Contrats' })); (C.contrats || []).forEach(function (c, i) { var s = el('input', { value: (c.societes || []).join(' ; ') }); s.addEventListener('input', function () { c.societes = s.value.split(';').map(function (x) { return x.trim(); }).filter(Boolean); }); sc.appendChild(el('div', { className: 'carte' }, [el('div', { className: 'grille' }, [ch2(c, 'id', 'Identifiant (ne plus le changer)'), ch2(c, 'titre', 'Titre')]), el('label', { className: 'champ', texte: 'Sociétés, séparées par ;' }, [s]), el('button', { className: 'secondaire danger', type: 'button', texte: 'Retirer', clic: function () { C.contrats.splice(i, 1); rendre(); } })])); });
+      sc.appendChild(el('button', { className: 'secondaire', type: 'button', texte: 'Ajouter un contrat', clic: function () { C.contrats = C.contrats || []; C.contrats.push({ id: '', titre: '', societes: [] }); rendre(); } }));
+      se.textContent = ''; se.appendChild(el('h2', { texte: 'Évaluations' })); (C.evaluations || []).forEach(function (e, i) { var s = el('select', { 'aria-label': 'Contrat' }); (C.contrats || []).forEach(function (c) { s.appendChild(el('option', { value: c.id, texte: c.titre || c.id, selected: c.id === e.contrat })); }); s.addEventListener('change', function () { e.contrat = s.value; }); e.diff = e.diff || {};
+        se.appendChild(el('div', { className: 'carte' }, [ch2(e, 'titre', 'Titre'), el('label', { className: 'champ', texte: 'Contrat' }, [s]), el('div', { className: 'grille' }, [ch2(e, 'nb', 'Nombre de questions', 'number'), ch2(e, 'duree_min', 'Durée (minutes)', 'number'), ch2(e, 'seuil', 'Seuil de réussite (%)', 'number'), ch2(e, 'ouvertes_max', 'Questions ouvertes au maximum', 'number'), ch2(e, 'elim_min', 'Questions de sécurité au minimum', 'number'), ch2(e.diff, 'F', 'Questions faciles', 'number'), ch2(e.diff, 'M', 'Questions moyennes', 'number'), ch2(e.diff, 'D', 'Questions difficiles', 'number')]), casee(e, 'afficher_score', 'Afficher le score au technicien'), casee(e, 'active', 'Session ouverte'), el('button', { className: 'secondaire danger', type: 'button', texte: 'Retirer', clic: function () { C.evaluations.splice(i, 1); rendre(); } })])); });
+      se.appendChild(el('button', { className: 'secondaire', type: 'button', texte: 'Ajouter une évaluation', clic: function () { C.evaluations = C.evaluations || []; C.evaluations.push({ id: 'EV-' + Date.now().toString(36).toUpperCase(), contrat: (C.contrats[0] || {}).id, titre: '', nb: 20, duree_min: 30, seuil: 70, afficher_score: true, active: false, diff: { F: 7, M: 9, D: 4 }, ouvertes_max: 2, elim_min: 2 }); rendre(); } }));
+    }
+    rendre(); v.appendChild(sc); v.appendChild(se);
+    v.appendChild(el('section', {}, [ch2(C, 'chat_id', 'Destinataire Telegram (chat_id)'), el('button', { className: 'principal', type: 'button', texte: 'Enregistrer la configuration', clic: function () { act({ action: 'admin_config', base_rev: A.config.rev, config: { contrats: C.contrats, evaluations: C.evaluations, chat_id: C.chat_id } }, 'Configuration enregistrée.'); } })]));
+  }
+  function vQuest(v) {
+    var cs = (A.config.contrats || []), sel = el('select', { 'aria-label': 'Contrat' }); cs.forEach(function (c) { sel.appendChild(el('option', { value: c.id, texte: c.titre })); }); if (copie) sel.value = copie.contrat;
+    var z = el('div'); v.appendChild(el('section', {}, [el('h2', { texte: 'Questions' }), sel, z])); sel.addEventListener('change', function () { copie = null; rendre(); });
+    function bq() { if (!copie || copie.contrat !== sel.value) { var b = A.banques[sel.value] || { contrat: sel.value, version: 0, statut: 'brouillon', questions: [] }; copie = JSON.parse(JSON.stringify(b)); copie.modifie = false; } return copie; }
+    function rendre() {
+      var b = bq(); z.textContent = ''; z.appendChild(el('p', {}, [el('span', { className: b.statut === 'validee' ? 'valide' : 'brouillon', texte: b.statut === 'validee' ? 'Validé' : 'Non validé' }), el('span', { className: 'petit', texte: ' — version ' + b.version + ', ' + b.questions.length + ' questions' + (b.modifie ? ', modifications non enregistrées' : '') })]));
+      var file = el('input', { type: 'file', accept: '.xlsx', 'aria-label': 'Fichier Excel validé' }); file.addEventListener('change', function () { if (file.files[0]) importer(file.files[0], b, rendre); });
+      z.appendChild(el('label', { className: 'champ', texte: 'Importer le fichier Excel validé' }, [file]));
+      z.appendChild(el('div', { className: 'ligne' }, [el('button', { className: 'secondaire', type: 'button', texte: 'Ajouter une question', clic: function () { var q = { id: 'Q' + Date.now().toString(36).toUpperCase(), type: 'qcm1', txt: '', theme: '', d: 'M', points: 2, elim: false, expl: '', options: [{ t: '', b: true }, { t: '', b: false }] }; b.questions.unshift(q); b.modifie = true; editer(q, b, rendre); } }), el('button', { className: 'secondaire', type: 'button', texte: 'Enregistrer en brouillon', clic: function () { act({ action: 'admin_banque', contrat: b.contrat, base_version: b.version, questions: nettoie(b.questions), valider: false }, 'Questionnaire enregistré en brouillon.'); } }), el('button', { className: 'principal', style: 'width:auto;padding:0 14px', type: 'button', texte: 'Valider pour publication', clic: function () { act({ action: 'admin_banque', contrat: b.contrat, base_version: b.version, questions: nettoie(b.questions), valider: true }, 'Questionnaire validé.'); } })]));
+      b.questions.forEach(function (q, i) { z.appendChild(el('div', { className: 'carte' }, [el('p', {}, [el('strong', { texte: q.id + (q.elim ? ' · sécurité' : '') })]), el('p', { texte: q.txt }), el('p', { className: 'petit', texte: q.theme + ' · ' + ({ F: 'Facile', M: 'Moyen', D: 'Difficile' })[q.d] + ' · ' + q.points + ' pt' }), q.a_verifier ? el('p', { className: 'petit brouillon', texte: q.a_verifier }) : null, el('div', { className: 'ligne' }, [el('button', { className: 'secondaire', type: 'button', texte: 'Modifier', clic: function () { editer(q, b, rendre); } }), el('button', { className: 'secondaire danger', type: 'button', texte: 'Retirer', clic: function () { b.questions.splice(i, 1); b.modifie = true; rendre(); } })])])); });
+    }
+    rendre();
+  }
+  function nettoie(l) { return l.map(function (q) { var r = Object.assign({}, q); if (r.type === 'vf') r.options = (r.options || []).slice(0, 2); if (r.type === 'ouverte') r.options = []; return r; }); }
+  function editer(q, b, retour) {
+    var z = $('a-vue'); z.textContent = ''; var w = JSON.parse(JSON.stringify(q)), s = el('section', {}, [el('h2', { texte: 'Modifier ' + q.id })]);
+    function ta(k, lab) { var t = el('textarea', { value: w[k] || '' }); t.addEventListener('input', function () { w[k] = t.value; }); return el('label', { className: 'champ', texte: lab }, [t]); }
+    function se(k, lab, o) { var t = el('select', {}); Object.keys(o).forEach(function (x) { t.appendChild(el('option', { value: x, texte: o[x], selected: x === String(w[k]) })); }); t.addEventListener('change', function () { w[k] = t.value; rep(); }); return el('label', { className: 'champ', texte: lab }, [t]); }
+    var r = el('div'); function rep() { r.textContent = ''; if (w.type === 'vf') w.options = [{ t: 'Vrai', b: !!(w.options[0] && w.options[0].b) }, { t: 'Faux', b: !(w.options[0] && w.options[0].b) }]; if (w.type === 'ouverte') { r.appendChild(ta('guide', 'Corrigé attendu')); return; } r.appendChild(el('h3', { texte: 'Réponses : cochez la ou les bonnes' })); (w.options || []).forEach(function (o, i) { var c = el('input', { type: 'checkbox', checked: !!o.b, 'aria-label': 'Bonne réponse' }), t = el('input', { type: 'text', value: o.t, 'aria-label': 'Réponse', readOnly: w.type === 'vf' }); c.addEventListener('change', function () { o.b = c.checked; if (w.type !== 'qcmn' && c.checked) { w.options.forEach(function (x, j) { x.b = j === i; }); rep(); } }); t.addEventListener('input', function () { o.t = t.value; }); r.appendChild(el('div', { className: 'reponse-ligne' }, [c, t, w.type === 'vf' ? el('span') : el('button', { className: 'secondaire', type: 'button', texte: '×', 'aria-label': 'Retirer la réponse', clic: function () { w.options.splice(i, 1); rep(); } })])); }); if (w.type !== 'vf') r.appendChild(el('button', { className: 'secondaire', type: 'button', texte: 'Ajouter une réponse', clic: function () { w.options.push({ t: '', b: false }); rep(); } })); }
+    var th = el('input', { value: w.theme }), pt = el('input', { type: 'number', min: 1, value: w.points }), el2 = el('input', { type: 'checkbox', checked: !!w.elim }); th.addEventListener('input', function () { w.theme = th.value; }); pt.addEventListener('input', function () { w.points = Number(pt.value); }); el2.addEventListener('change', function () { w.elim = el2.checked; });
+    [ta('txt', 'Question'), el('div', { className: 'grille' }, [el('label', { className: 'champ', texte: 'Thème' }, [th]), se('d', 'Difficulté', { F: 'Facile', M: 'Moyen', D: 'Difficile' }), se('type', 'Type', { qcm1: 'QCM une réponse', qcmn: 'QCM plusieurs réponses', vf: 'Vrai ou faux', ouverte: 'Question ouverte' }), el('label', { className: 'champ', texte: 'Points' }, [pt])]), el('label', { className: 'case' }, [el2, el('span', { texte: 'Question éliminatoire pour la sécurité' })]), r, ta('expl', 'Explication'), ta('source', 'Source')].forEach(function (x) { s.appendChild(x); }); rep();
+    s.appendChild(el('div', { className: 'nav' }, [el('button', { className: 'secondaire', type: 'button', texte: 'Annuler', clic: vueAdmin }), el('button', { className: 'principal', type: 'button', texte: 'Appliquer', clic: function () { Object.assign(q, w); b.modifie = true; vueAdmin(); } })])); z.appendChild(s);
+  }
+  function charge(u) { return new Promise(function (ok, ko) { if (window.XLSX) return ok(); var s = document.createElement('script'); s.src = u; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+  async function importer(fichier, b, retour) {
+    info('Lecture du fichier…'); try { await charge('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'); var wb = XLSX.read(await fichier.arrayBuffer()), f = wb.Sheets['Questions']; if (!f) return info('Onglet Questions introuvable.', 'erreur'); var l = XLSX.utils.sheet_to_json(f, { defval: '' }), TY = { 'QCM une réponse': 'qcm1', 'QCM plusieurs réponses': 'qcmn', 'Vrai ou faux': 'vf', 'Ouverte courte': 'ouverte' }, DI = { Facile: 'F', Moyen: 'M', Difficile: 'D' }, out = [], cor = 0, ret = 0;
+      l.forEach(function (x) { var d = String(x['Décision']).trim(); if (d === 'À retirer') { ret++; return; } if (d === 'À corriger') cor++; var t = TY[x['Type']], q = { id: String(x['N°']).trim(), type: t, txt: String(x['Question']).trim(), theme: String(x['Thème']).trim(), d: DI[x['Difficulté']], points: Number(x['Points']), elim: x['Éliminatoire'] === 'Oui', expl: String(x['Explication']).trim(), source: String(x['Source']).trim(), a_verifier: String(x['À vérifier']).trim(), options: [] }; if (t === 'ouverte') q.guide = String(x['Réponse A']).replace(/^Attendu : /, '').trim(); else { var bon = String(x['Bonne(s) réponse(s)']).split(',').map(function (y) { return y.trim(); }); ['A', 'B', 'C', 'D', 'E'].forEach(function (k) { var v = String(x['Réponse ' + k]).trim(); if (v) q.options.push({ t: v, b: bon.indexOf(k) >= 0 }); }); } out.push(q); });
+      b.questions = out; b.modifie = true; retour(); info(out.length + ' questions importées' + (ret ? ', ' + ret + ' retirées' : '') + (cor ? '. Attention : ' + cor + ' encore à corriger' : '') + '. Enregistrez pour conserver.', cor ? 'erreur' : 'succes'); }
+    catch (e) { info('Fichier illisible.', 'erreur'); }
+  }
+  /* Démarrage */
+  (async function () {
+    await chargerContrats(); var s = lire(CLE);
+    if (s && s.token) { try { var r = await api({ action: 'reprendre', token: s.token }, 2); if (r.termine) return fin(r); if (r.ok) return lancer(r); effacer(CLE); } catch (e) { info('Connexion impossible pour reprendre votre évaluation. Rechargez la page dès le retour du réseau.', 'erreur'); } }
+  })();
+})();
+</script>
+</body>
+</html>
