@@ -79,9 +79,11 @@
   #message.succes { border-color: var(--vert); }
   #message ul { margin: 6px 0 0; padding-left: 20px; }
   #chargement { color: var(--doux); }
-  #rq-etat { margin: 10px 0 0; font-size: 15px; }
-  #rq-etat.erreur { color: var(--rouge); }
-  #rq-etat.succes { color: var(--vert); }
+  #adm-forme { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #adm-forme label { display: flex; flex-direction: column; justify-content: flex-end; }
+  #rq-etat, #adm-forme-etat { margin: 10px 0 0; font-size: 15px; }
+  #rq-etat.erreur, #adm-forme-etat.erreur { color: var(--rouge); }
+  #rq-etat.succes, #adm-forme-etat.succes { color: var(--vert); }
   #bandeau-admin { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--bleu-fort); font-weight: 600; font-size: 14px; }
   .ajout-ligne { margin-top: 10px; }
   .ligne-suppr { display: flex; gap: 8px; align-items: center; }
@@ -120,6 +122,15 @@
       <h2>Modèle du rapport</h2>
       <p class="aide">Rien n'est appliqué avant « Enregistrer le modèle ». Les rapports déjà générés ne changent pas.</p>
       <div class="grille" id="adm-general"></div>
+    </section>
+    <section>
+      <h2>Mise en forme du PDF</h2>
+      <p class="aide">S'applique au PDF et à l'impression des prochains rapports. L'Excel garde sa mise en page, sauf le nombre de lignes libres.</p>
+      <div class="grille" id="adm-forme"></div>
+      <p class="aide ajout-ligne" id="adm-reste"></p>
+      <button type="button" class="secondaire" id="adm-apercu">Aperçu du PDF</button>
+      <button type="button" class="secondaire" id="adm-defaut" style="margin-top:8px">Valeurs par défaut</button>
+      <p id="adm-forme-etat" role="status" aria-live="polite" hidden></p>
     </section>
     <section>
       <h2>Résumé Telegram</h2>
@@ -162,10 +173,13 @@
         <label class="champ">Intervenant(s)<input id="intervenants" required></label>
         <label class="champ">Chargé de suivi<input id="charge_suivi" required></label>
         <label class="champ">Local / zone (facultatif)<input id="local" maxlength="120"></label>
-        <label class="champ">Date d'intervention<input id="date" type="date" required></label>
+        <label class="champ">Durée de l'intervention<select id="duree"><option value="jour">Un seul jour</option><option value="periode">Plusieurs jours (période)</option></select></label>
+        <label class="champ"><span id="lib-date">Date d'intervention</span><input id="date" type="date" required></label>
+        <label class="champ" id="champ-date-fin" hidden>Date de fin<input id="date_fin" type="date"></label>
         <label class="champ">Périodicité<select id="periodicite" required></select></label>
         <label class="champ">Heure de début<input id="heure_debut" type="time" required></label>
         <label class="champ">Heure de fin<input id="heure_fin" type="time" required></label>
+        <p class="aide large" id="aide-periode" hidden>Pour une période : heure de début du premier jour, heure de fin du dernier jour.</p>
         <label class="champ" id="champ-trimestre">Trimestre
           <select id="trimestre"><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option><option value="T4">T4</option></select>
         </label>
@@ -235,7 +249,14 @@
   var CLE_MODELE = 'sitb_rp_fm_modele_v5';
   var CLE_ENTETE = 'sitb_rp_fm_entete_v1';
   var CLE_CODE = 'sitb_rp_ac_code';
-  var CHAMPS_META = ['marche', 'societe', 'intervenants', 'charge_suivi', 'local', 'date', 'periodicite', 'heure_debut', 'heure_fin', 'trimestre', 'annee'];
+  var CHAMPS_META = ['marche', 'societe', 'intervenants', 'charge_suivi', 'local', 'date', 'date_fin', 'periodicite', 'heure_debut', 'heure_fin', 'trimestre', 'annee'];
+  var FORME_DEFAUT = { texte: 10.5, titre: 13, sous_titre: 11, infos: 9.5, marge_haut: 6, marge_bas: 11, marge_gauche: 6, marge_droite: 6, espace: 0.75, col_operations: 50, col_fait: 6, col_non_fait: 8, hauteur_logo: 48, hauteur_visa: 72, lignes_vides: 2, couleur_entete: '#c9d6e8', couleur_section: '#dbe4f0' };
+  var CHAMPS_FORME = [
+    ['texte', 'Texte des tableaux (pt)', 8, 13, 0.5], ['titre', 'Titre (pt)', 10, 18, 0.5], ['sous_titre', 'Liste des sous-systèmes (pt)', 8, 14, 0.5], ['infos', 'Infos société (pt)', 7, 12, 0.5],
+    ['marge_haut', 'Marge haut (mm)', 3, 25, 1], ['marge_bas', 'Marge bas (mm)', 8, 25, 1], ['marge_gauche', 'Marge gauche (mm)', 3, 25, 1], ['marge_droite', 'Marge droite (mm)', 3, 25, 1],
+    ['espace', 'Espacement des lignes (pt)', 0, 6, 0.25], ['lignes_vides', 'Lignes libres par équipement', 0, 5, 1], ['col_operations', 'Colonne opérations (%)', 30, 65, 1], ['col_fait', 'Colonne Fait (%)', 4, 12, 1],
+    ['col_non_fait', 'Colonne Non fait (%)', 4, 12, 1], ['hauteur_logo', 'Hauteur des logos (pt)', 24, 80, 1], ['hauteur_visa', 'Hauteur des visas (pt)', 40, 150, 1]
+  ];
   var MAX_LIBRES = 20, role = 'technicien', rev = 0, notif = null, adm = null;
   var MAX_EQUIPEMENTS = 40;
   var modele = null, dernier = null, enCours = false, pret = false, compteurUid = 0;
@@ -539,7 +560,14 @@
       var x = $(c); x.classList.remove('invalide');
       if (!x.value.trim()) marque(x, x.parentNode.firstChild.textContent.trim() + ' : champ obligatoire');
     });
-    if ($('heure_debut').value && $('heure_fin').value && $('heure_fin').value <= $('heure_debut').value) marque($('heure_fin'), "L'heure de fin doit suivre l'heure de début");
+    var periode = $('duree').value === 'periode', fin = $('date_fin');
+    fin.classList.remove('invalide');
+    if (periode) {
+      if (!fin.value) marque(fin, 'Date de fin : champ obligatoire');
+      else if ($('date').value && fin.value <= $('date').value) marque(fin, 'La date de fin doit suivre la date de début');
+      else if ($('date').value && (Date.parse(fin.value) - Date.parse($('date').value)) / 86400000 > 90) marque(fin, 'Période limitée à 90 jours');
+    }
+    if (!periode && $('heure_debut').value && $('heure_fin').value && $('heure_fin').value <= $('heure_debut').value) marque($('heure_fin'), "L'heure de fin doit suivre l'heure de début");
     if (!etat.types.length) { e.push('Sélectionnez au moins un sous-système'); premier = premier || $('sous-systemes'); }
     if (!etat.instances.length) { e.push('Sélectionnez au moins un équipement'); premier = premier || $('bloc-articles'); }
     etat.instances.forEach(function (inst) {
@@ -614,6 +642,14 @@
     document.body.appendChild(f);
   }
 
+  function majDuree() {
+    var periode = $('duree').value === 'periode';
+    $('champ-date-fin').hidden = !periode; $('aide-periode').hidden = !periode;
+    $('lib-date').textContent = periode ? 'Date de début' : "Date d'intervention";
+    if (!periode) { $('date_fin').value = ''; $('date_fin').classList.remove('invalide'); }
+    $('date_fin').min = $('date').value;
+  }
+
   function restaurer() {
     var b = lire(CLE_BROUILLON), en = lire(CLE_ENTETE);
     if (en) { entete.logos = en.logos || {}; entete.infos = en.infos || ''; }
@@ -630,6 +666,7 @@
       var d = aujourdhui();
       $('date').value = d; $('trimestre').value = trimestreDe(d); $('annee').value = d.slice(0, 4);
     }
+    $('duree').value = $('date_fin').value ? 'periode' : 'jour'; majDuree();
     $('infos_societe').value = (b && b.infos_societe) || entete.infos;
     afficherLogo('societe', 'zone-societe', 'logo-societe');
     afficherLogo('hopital', 'zone-hopital', 'logo-hopital');
@@ -718,8 +755,58 @@
     return d;
   }
   function lignes(v) { return v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); }
+  function etatForme(type, texte) { var p = $('adm-forme-etat'); p.className = type; p.textContent = texte; p.hidden = false; }
+  function erreursForme(f) {
+    var e = [];
+    CHAMPS_FORME.forEach(function (c) {
+      var v = f[c[0]];
+      if (v === '' || !isFinite(v) || v < c[2] || v > c[3]) e.push(c[1] + ' : entre ' + c[2] + ' et ' + c[3]);
+    });
+    if (f.col_operations + f.col_fait + f.col_non_fait > 85) e.push('La colonne remarques doit garder au moins 15 %');
+    return e;
+  }
+  function majReste() {
+    var f = adm.modele.forme, r = 100 - f.col_operations - f.col_fait - f.col_non_fait;
+    $('adm-reste').textContent = isFinite(r) ? 'Colonne remarques : ' + r + ' %' : '';
+  }
+  function afficherForme() {
+    var g = $('adm-forme'), f = adm.modele.forme; g.textContent = '';
+    CHAMPS_FORME.forEach(function (c) {
+      var lab = el('label', 'champ', c[1]), i = el('input');
+      i.type = 'number'; i.min = c[2]; i.max = c[3]; i.step = c[4]; i.inputMode = 'decimal'; i.value = f[c[0]];
+      i.addEventListener('input', function () { f[c[0]] = i.value === '' ? '' : Number(i.value); majReste(); });
+      lab.appendChild(i); g.appendChild(lab);
+    });
+    [['couleur_entete', 'Couleur des titres de tableau'], ['couleur_section', 'Couleur des titres de section']].forEach(function (c) {
+      var lab = el('label', 'champ', c[1]), i = el('input');
+      i.type = 'color'; i.value = f[c[0]];
+      i.addEventListener('input', function () { f[c[0]] = i.value; });
+      lab.appendChild(i); g.appendChild(lab);
+    });
+    majReste();
+  }
+  async function apercuForme() {
+    var e = erreursForme(adm.modele.forme);
+    if (e.length) { etatForme('erreur', e.join(' · ')); return; }
+    var b = $('adm-apercu'); b.disabled = true;
+    etatForme('', 'Préparation de l\'aperçu…');
+    try {
+      var ctrl = new AbortController();
+      var limite = setTimeout(function () { ctrl.abort(); }, 60000);
+      var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal, body: JSON.stringify({ code: lireCode(), action: 'apercu_forme', forme: adm.modele.forme, logos: entete.logos }) });
+      clearTimeout(limite);
+      var r = await rep.json();
+      if (!r.ok || !r.pdf_base64) { etatForme('erreur', (r.erreurs || ['Aperçu impossible. Réessayez.']).join(' ')); return; }
+      telecharger(r.pdf_base64, 'application/pdf', 'apercu-rapport.pdf');
+      etatForme('succes', 'Aperçu téléchargé. Il n\'est pas ajouté au registre.');
+    } catch (err) {
+      etatForme('erreur', 'Aperçu impossible : vérifiez le réseau puis réessayez.');
+    } finally { b.disabled = false; }
+  }
   function ouvrirAdmin() {
     adm = { modele: JSON.parse(JSON.stringify(modele)), notif: Object.assign({ actif: false, chat_id: '' }, notif || {}) };
+    adm.modele.forme = Object.assign({}, FORME_DEFAUT, adm.modele.forme || {});
+    afficherForme(); $('adm-forme-etat').hidden = true;
     var g = $('adm-general'); g.textContent = '';
     g.appendChild(champAdmin('Titre du rapport', adm.modele.titre, function (v) { adm.modele.titre = v; }, false, true));
     g.appendChild(champAdmin('Client', adm.modele.client, function (v) { adm.modele.client = v; }, false, true));
@@ -738,6 +825,8 @@
   }
   async function enregistrerModele() {
     adm.notif = { actif: $('adm-notif').checked, chat_id: $('adm-chat').value.trim() };
+    var ef = erreursForme(adm.modele.forme);
+    if (ef.length) { message('erreur', 'Mise en forme à corriger', ef.slice(0, 8)); return; }
     var b = $('adm-enregistrer'); b.disabled = true;
     try {
       var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: lireCode(), action: 'enregistrer_modele', rev: rev, modele: adm.modele, notif: adm.notif }) });
@@ -811,8 +900,10 @@
       $(c).addEventListener('input', function () { $(c).classList.remove('invalide'); modifie(); });
     });
     $('periodicite').addEventListener('change', function () { rendre(); modifie(); });
+    $('duree').addEventListener('change', function () { majDuree(); modifie(); });
     $('date').addEventListener('change', function () {
       var d = $('date').value;
+      $('date_fin').min = d;
       if (d) { $('trimestre').value = trimestreDe(d); $('annee').value = d.slice(0, 4); modifie(); }
     });
     $('logo-societe').addEventListener('change', function () { chargerLogo(this, 'societe', 'zone-societe'); });
@@ -833,6 +924,8 @@
     $('btn-admin').addEventListener('click', ouvrirAdmin);
     $('rq-envoyer').addEventListener('click', envoyerRemarque);
     $('adm-fermer').addEventListener('click', fermerAdmin);
+    $('adm-apercu').addEventListener('click', apercuForme);
+    $('adm-defaut').addEventListener('click', function () { adm.modele.forme = Object.assign({}, FORME_DEFAUT); afficherForme(); });
     $('adm-enregistrer').addEventListener('click', enregistrerModele);
     $('adm-ajout-type').addEventListener('click', function () {
       var t = { id: nouvelId('t'), titre: 'Nouveau sous-système', operations: [], equipements: [] };
