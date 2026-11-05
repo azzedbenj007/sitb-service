@@ -79,6 +79,9 @@
   #message.succes { border-color: var(--vert); }
   #message ul { margin: 6px 0 0; padding-left: 20px; }
   #chargement { color: var(--doux); }
+  #rq-etat { margin: 10px 0 0; font-size: 15px; }
+  #rq-etat.erreur { color: var(--rouge); }
+  #rq-etat.succes { color: var(--vert); }
   #bandeau-admin { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--bleu-fort); font-weight: 600; font-size: 14px; }
   .ajout-ligne { margin-top: 10px; }
   .ligne-suppr { display: flex; gap: 8px; align-items: center; }
@@ -191,6 +194,23 @@
         <label class="champ large">Résultat de l'intervention<select id="resultat" required></select></label>
         <label class="champ large">Observation<textarea id="observation" maxlength="1500"></textarea></label>
       </div>
+    </section>
+    <section>
+      <h2>Remarque ou réclamation</h2>
+      <p class="aide">Votre message est envoyé au superviseur sur Telegram. Il ne modifie pas le rapport.</p>
+      <div class="grille">
+        <label class="champ">Type
+          <select id="rq-type"><option>Remarque</option><option>Réclamation</option></select>
+        </label>
+        <label class="champ">Sujet
+          <select id="rq-sujet"><option>Forme du rapport</option><option>Contenu du rapport</option><option>Autre</option></select>
+        </label>
+        <label class="champ">Votre nom<input id="rq-nom" maxlength="120" autocomplete="name"></label>
+        <label class="champ">Référence du rapport (facultatif)<input id="rq-reference" maxlength="40" autocomplete="off"></label>
+        <label class="champ large">Message<textarea id="rq-message" maxlength="1500"></textarea></label>
+      </div>
+      <button type="button" class="principal" id="rq-envoyer">Envoyer au superviseur</button>
+      <p id="rq-etat" role="status" aria-live="polite" hidden></p>
     </section>
     <button type="button" class="secondaire" id="nouveau">Nouveau rapport</button>
   </form>
@@ -565,6 +585,7 @@
       if (r.acces === false) { garderCode(''); afficherAcces(); message('erreur', 'Mot de passe incorrect. Votre saisie reste sur cet appareil.'); return null; }
       if (!r.ok) { message('erreur', 'Rapport refusé', r.erreurs || []); return null; }
       dernier = { cle: cle, reference: r.reference, html: r.html, pdf: r.pdf_base64, xlsx: r.xlsx_base64 };
+      $('rq-reference').value = r.reference;
       message('succes', 'Rapport ' + r.reference + ' enregistré au registre.');
       return dernier;
     } catch (err) {
@@ -732,6 +753,31 @@
     } finally { b.disabled = false; }
   }
 
+  function etatRemarque(type, texte) {
+    var p = $('rq-etat'); p.className = type; p.textContent = texte; p.hidden = false;
+  }
+  async function envoyerRemarque() {
+    var nom = $('rq-nom').value.trim(), texte = $('rq-message').value.trim();
+    $('rq-nom').classList.toggle('invalide', !nom);
+    $('rq-message').classList.toggle('invalide', !texte);
+    if (!nom || !texte) { etatRemarque('erreur', 'Indiquez votre nom et votre message.'); return; }
+    var b = $('rq-envoyer'); b.disabled = true;
+    etatRemarque('', 'Envoi en cours…');
+    try {
+      var ctrl = new AbortController();
+      var limite = setTimeout(function () { ctrl.abort(); }, 30000);
+      var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal, body: JSON.stringify({ code: lireCode(), action: 'envoyer_remarque', type: $('rq-type').value, sujet: $('rq-sujet').value, nom: nom, reference: $('rq-reference').value.trim(), message: texte }) });
+      clearTimeout(limite);
+      var r = await rep.json();
+      if (r.acces === false) { garderCode(''); afficherAcces(); message('erreur', 'Mot de passe incorrect. Votre saisie reste sur cet appareil.'); return; }
+      if (!r.ok) { etatRemarque('erreur', (r.erreurs || ['Envoi impossible. Réessayez.']).join(' ')); return; }
+      $('rq-message').value = '';
+      etatRemarque('succes', 'Message envoyé au superviseur.');
+    } catch (e) {
+      etatRemarque('erreur', 'Envoi impossible : vérifiez le réseau puis réessayez. Votre message est conservé.');
+    } finally { b.disabled = false; }
+  }
+
   function afficherAcces() {
     $('chargement').hidden = true; $('form').hidden = true; $('barre').hidden = true; $('admin').hidden = true; $('bandeau-admin').hidden = true; $('acces').hidden = false;
     $('code').value = ''; $('code').focus();
@@ -785,6 +831,7 @@
       else message('erreur', "Le fichier Excel n'a pas pu être créé pour ce rapport. Le PDF reste disponible.");
     });
     $('btn-admin').addEventListener('click', ouvrirAdmin);
+    $('rq-envoyer').addEventListener('click', envoyerRemarque);
     $('adm-fermer').addEventListener('click', fermerAdmin);
     $('adm-enregistrer').addEventListener('click', enregistrerModele);
     $('adm-ajout-type').addEventListener('click', function () {
