@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Rapports préventifs assainissement | SITB</title>
+<style>
+  :root {
+    --fond: #f3f6fb; --panneau: #ffffff; --champ: #ffffff; --bord: #c9d5e4;
+    --texte: #16243a; --doux: #55647a; --bleu: #1565d8; --bleu-fort: #1258c0;
+    --vert: #157a4f; --rouge: #c8303a;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fond); color: var(--texte); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; padding-bottom: 150px; }
+  header { padding: 22px 16px 14px; max-width: 860px; margin: 0 auto; }
+  .surtitre { color: var(--bleu-fort); font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+  h1 { font-size: 24px; line-height: 1.2; margin: 4px 0 6px; }
+  header p { margin: 0; color: var(--doux); font-size: 15px; }
+  main { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  section, details.bloc { background: var(--panneau); border: 1px solid var(--bord); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+  h2 { font-size: 17px; margin: 0 0 12px; }
+  h3 { font-size: 15px; margin: 16px 0 8px; color: var(--bleu-fort); }
+  h3:first-child { margin-top: 0; }
+  .aide { color: var(--doux); font-size: 14px; margin: -6px 0 12px; }
+  .grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .large { grid-column: 1 / -1; }
+  label.champ { display: block; font-size: 14px; color: var(--doux); }
+  input, select, textarea { width: 100%; margin-top: 4px; min-height: 44px; padding: 9px 10px; background: var(--champ); color: var(--texte); border: 1px solid var(--bord); border-radius: 7px; font: inherit; color-scheme: light; }
+  input[readonly] { color: var(--doux); }
+  textarea { min-height: 76px; resize: vertical; }
+  input:focus, select:focus, textarea:focus, button:focus-visible, summary:focus-visible { outline: 2px solid var(--bleu); outline-offset: 1px; }
+  .invalide { border-color: var(--rouge) !important; }
+  .cases { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .case { display: flex; gap: 9px; align-items: center; min-height: 44px; padding: 8px 10px; background: var(--champ); border: 1px solid var(--bord); border-radius: 7px; font-size: 15px; }
+  .case input { width: 20px; height: 20px; min-height: 0; margin: 0; flex: none; accent-color: var(--bleu); }
+  .case small { display: block; color: var(--doux); font-size: 13px; }
+  .article { margin-bottom: 8px; }
+  .filtre { margin: 0 0 10px; }
+  .details { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; padding: 8px 10px 4px; }
+  .supprimer { grid-column: 1 / -1; justify-self: start; }
+  summary { cursor: pointer; font-weight: 600; display: flex; justify-content: space-between; gap: 12px; }
+  summary small { color: var(--doux); font-weight: 400; display: block; }
+  summary .compte { flex: none; color: var(--doux); font-weight: 400; font-size: 14px; }
+  details.bloc[open] summary { margin-bottom: 12px; }
+  .operation { padding: 12px 0; border-top: 1px solid var(--bord); }
+  .operation.premier { border-top: 0; padding-top: 0; }
+  .ligne-op { display: flex; gap: 12px; justify-content: space-between; align-items: center; }
+  .libelle { font-size: 15px; }
+  .ligne-op input { margin-top: 0; }
+  .choix { display: flex; flex: none; border: 1px solid var(--bord); border-radius: 7px; overflow: hidden; }
+  .choix button { min-height: 44px; min-width: 76px; padding: 0 10px; border: 0; background: #eef2f8; color: var(--doux); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .choix button + button { border-left: 1px solid var(--bord); }
+  .choix button[aria-pressed="true"].fait { background: var(--vert); color: #fff; }
+  .choix button[aria-pressed="true"].non { background: var(--rouge); color: #fff; }
+  .operation.a-revoir .choix { border-color: var(--rouge); }
+  .operation > input { margin-top: 9px; }
+  .piece { display: grid; grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr) 44px; gap: 8px; margin-bottom: 8px; align-items: end; }
+  .piece input { margin-top: 0; }
+  .retirer { min-height: 44px; border: 1px solid var(--bord); border-radius: 7px; background: var(--champ); color: var(--doux); font-size: 20px; cursor: pointer; }
+  .secondaire { min-height: 44px; padding: 0 14px; border: 1px solid var(--bord); border-radius: 7px; background: transparent; color: var(--bleu-fort); font: inherit; font-weight: 600; cursor: pointer; }
+  .logo-zone { display: flex; gap: 10px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+  .logo-zone img { max-height: 56px; max-width: 150px; background: #fff; border: 1px solid var(--bord); border-radius: 4px; padding: 3px; }
+  .logo-zone input[type=file] { flex: 1 1 180px; padding: 8px; }
+  .principal { width: 100%; margin-top: 12px; min-height: 48px; border: 1px solid var(--bleu); border-radius: 7px; background: var(--bleu); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+  #barre { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, .94); backdrop-filter: blur(6px); border-top: 1px solid var(--bord); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .barre-int { max-width: 828px; margin: 0 auto; }
+  .avancement { display: flex; justify-content: space-between; font-size: 13px; color: var(--doux); margin-bottom: 6px; gap: 12px; }
+  .jauge { height: 5px; background: var(--bord); border-radius: 3px; overflow: hidden; margin-bottom: 9px; }
+  .jauge div { height: 100%; width: 0; background: var(--bleu); transition: width .15s; }
+  .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .actions button { min-height: 48px; border-radius: 7px; border: 1px solid var(--bleu); font: inherit; font-weight: 700; cursor: pointer; }
+  #btn-pdf { background: var(--bleu); color: #fff; }
+  #btn-imprimer, #btn-excel { background: transparent; color: var(--bleu-fort); }
+  .actions button:disabled { opacity: .55; cursor: wait; }
+  #message { max-width: 828px; margin: 0 auto 14px; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--bord); background: var(--panneau); font-size: 15px; }
+  #message.erreur { border-color: var(--rouge); }
+  #message.succes { border-color: var(--vert); }
+  #message ul { margin: 6px 0 0; padding-left: 20px; }
+  #chargement { color: var(--doux); }
+  .adm-contrat { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--bord); display: grid; gap: 8px; }
+  .adm-contrat .cases { margin: 0; }
+  .adm-champ { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto 44px 44px; gap: 8px; align-items: center; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--bord); }
+  .adm-champ input[type="text"] { margin-top: 0; }
+  .adm-champ .case { padding: 0 8px; }
+  .adm-champ.retire { grid-template-columns: minmax(0, 1fr) auto; color: var(--doux); }
+  @media (max-width: 620px) {
+    .adm-champ { grid-template-columns: minmax(0, 1fr) 44px 44px; }
+    .adm-champ input[type="text"] { grid-column: 1 / -1; }
+    .adm-champ.retire { grid-template-columns: minmax(0, 1fr) auto; }
+  }
+  #adm-forme { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #adm-forme label { display: flex; flex-direction: column; justify-content: flex-end; }
+  #rq-etat, #adm-forme-etat { margin: 10px 0 0; font-size: 15px; }
+  #rq-etat.erreur, #adm-forme-etat.erreur { color: var(--rouge); }
+  #rq-etat.succes, #adm-forme-etat.succes { color: var(--vert); }
+  #bandeau-admin { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--bleu-fort); font-weight: 600; font-size: 14px; }
+  .ajout-ligne { margin-top: 10px; }
+  .ligne-suppr { display: flex; gap: 8px; align-items: center; }
+  .ligne-suppr .libre { flex: 1; min-width: 0; }
+  .adm-op { display: grid; grid-template-columns: minmax(0, 1fr) 130px 44px 44px; gap: 8px; margin-bottom: 8px; }
+  .adm-eq { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) 44px; gap: 8px; margin-bottom: 8px; }
+  .adm-op input, .adm-op select, .adm-eq input { margin-top: 0; }
+  .danger { color: var(--rouge); border-color: var(--rouge); }
+  #admin-barre { position: sticky; bottom: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 0; background: var(--fond); }
+  #admin-barre button { min-height: 48px; }
+  @media (max-width: 620px) {
+    .grille, .cases, .details { grid-template-columns: minmax(0, 1fr); }
+    .ligne-op { flex-direction: column; align-items: stretch; gap: 8px; }
+    .choix button { flex: 1; }
+    .piece { grid-template-columns: minmax(0, 1fr) 84px; }
+    .piece .remarque { grid-column: 1 / 2; }
+    .adm-op { grid-template-columns: minmax(0, 1fr) 44px 44px; padding-bottom: 8px; border-bottom: 1px solid var(--bord); }
+    .adm-op input { grid-column: 1 / -1; }
+    .adm-eq { grid-template-columns: minmax(0, 1fr) 44px; padding-bottom: 8px; border-bottom: 1px solid var(--bord); }
+    .adm-eq input { grid-column: 1; }
+    .adm-eq .retirer { grid-row: 1; grid-column: 2; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="surtitre">SITB · Maintenance préventive</div>
+  <h1>Rapports préventifs : assainissement</h1>
+  <p>Postes, onduleurs, groupes, réseaux et courant faible, dans un seul rapport si besoin</p>
+</header>
+<main>
+  <div id="message" role="status" aria-live="polite" hidden></div>
+  <div id="bandeau-admin" hidden><span>Mode administrateur</span><button type="button" class="secondaire" id="btn-admin">Gérer le modèle</button></div>
+  <div id="admin" hidden>
+    <section>
+      <h2>Modèle du rapport</h2>
+      <p class="aide">Rien n'est appliqué avant « Enregistrer le modèle ». Les rapports déjà générés ne changent pas.</p>
+      <div class="grille" id="adm-general"></div>
+    </section>
+    <section>
+      <h2>Contrats</h2>
+      <p class="aide">Le contrat choisi remplit le marché et la société, fixe l'objet du rapport et limite les sous-systèmes.</p>
+      <div id="adm-contrats"></div>
+      <button type="button" class="secondaire" id="adm-ajout-contrat">Ajouter un contrat</button>
+    </section>
+    <section>
+      <h2>Informations générales</h2>
+      <p class="aide">Ajoutez, renommez, déplacez ou supprimez les informations saisies dans chaque rapport. Les dates, les heures, la périodicité et l'année restent fixes : la référence et les opérations en dépendent.</p>
+      <div id="adm-champs"></div>
+      <button type="button" class="secondaire" id="adm-ajout-champ">Ajouter une information</button>
+    </section>
+    <section>
+      <h2>Mise en forme du PDF</h2>
+      <p class="aide">S'applique au PDF et à l'impression des prochains rapports. L'Excel garde sa mise en page, sauf le nombre de lignes libres.</p>
+      <div class="grille" id="adm-forme"></div>
+      <p class="aide ajout-ligne" id="adm-reste"></p>
+      <button type="button" class="secondaire" id="adm-apercu">Aperçu du PDF</button>
+      <button type="button" class="secondaire" id="adm-defaut" style="margin-top:8px">Valeurs par défaut</button>
+      <p id="adm-forme-etat" role="status" aria-live="polite" hidden></p>
+    </section>
+    <section>
+      <h2>Résumé Telegram</h2>
+      <p class="aide">Envoyé par Nova Master au superviseur après chaque rapport.</p>
+      <label class="case"><input type="checkbox" id="adm-notif"> Envoyer le résumé</label>
+      <label class="champ ajout-ligne">Identifiant Telegram du superviseur<input id="adm-chat" inputmode="numeric" maxlength="20"></label>
+    </section>
+    <section>
+      <h2>Sous-systèmes</h2>
+      <div id="adm-types"></div>
+      <button type="button" class="secondaire" id="adm-ajout-type">Ajouter un sous-système</button>
+    </section>
+    <div id="admin-barre">
+      <button type="button" class="principal" id="adm-enregistrer" style="margin-top:0">Enregistrer le modèle</button>
+      <button type="button" class="secondaire" id="adm-fermer">Annuler</button>
+    </div>
+  </div>
+  <section id="acces" hidden>
+    <h2>Accès réservé</h2>
+    <form id="form-acces">
+      <label class="champ">Mot de passe<input id="code" type="password" autocomplete="current-password" required></label>
+      <button type="submit" class="principal" id="btn-acces">Accéder</button>
+    </form>
+  </section>
+  <form id="form" novalidate hidden>
+    <section>
+      <h2>En-tête du rapport</h2>
+      <div class="grille">
+        <div class="champ"><label class="champ" for="logo-societe">Logo de la société (en haut à gauche)</label><div class="logo-zone" id="zone-societe"><input id="logo-societe" type="file" accept="image/png,image/jpeg"></div></div>
+        <div class="champ"><label class="champ" for="logo-hopital">Logo de l'hôpital (en haut à droite)</label><div class="logo-zone" id="zone-hopital"><input id="logo-hopital" type="file" accept="image/png,image/jpeg"></div></div>
+        <label class="champ large">Informations de la société (adresse, téléphone, fax, e-mail)<textarea id="infos_societe" maxlength="400"></textarea></label>
+      </div>
+    </section>
+    <section>
+      <h2>Informations générales</h2>
+      <div class="grille">
+        <label class="champ">Client<input id="client" readonly></label>
+        <label class="champ large">Contrat<select id="contrat" required></select></label>
+        <div id="champs-infos" style="display:contents"></div>
+        <label class="champ">Durée de l'intervention<select id="duree"><option value="jour">Un seul jour</option><option value="periode">Plusieurs jours (période)</option></select></label>
+        <label class="champ"><span id="lib-date">Date d'intervention</span><input id="date" type="date" required></label>
+        <label class="champ" id="champ-date-fin" hidden>Date de fin<input id="date_fin" type="date"></label>
+        <label class="champ">Périodicité<select id="periodicite" required></select></label>
+        <label class="champ">Heure de début<input id="heure_debut" type="time" required></label>
+        <label class="champ">Heure de fin<input id="heure_fin" type="time" required></label>
+        <p class="aide large" id="aide-periode" hidden>Pour une période : heure de début du premier jour, heure de fin du dernier jour.</p>
+        <label class="champ" id="champ-trimestre">Trimestre
+          <select id="trimestre"><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option><option value="T4">T4</option></select>
+        </label>
+        <label class="champ">Année<input id="annee" inputmode="numeric" maxlength="4" required></label>
+      </div>
+    </section>
+    <section>
+      <h2>Sous-systèmes du rapport</h2>
+      <p class="aide">Seules les opérations des sous-systèmes cochés apparaîtront.</p>
+      <div class="cases" id="sous-systemes"></div>
+    </section>
+    <section id="bloc-articles" hidden>
+      <h2>Articles concernés</h2>
+      <p class="aide">Cochez les équipements à regrouper dans ce rapport, puis indiquez l'état de chacun. Chaque équipement aura sa propre section.</p>
+      <div id="articles"></div>
+    </section>
+    <div id="sections"></div>
+    <section>
+      <h2>Pièces détachées changées</h2>
+      <div id="pieces"></div>
+      <button type="button" class="secondaire" id="ajout-piece">Ajouter une pièce</button>
+    </section>
+    <section>
+      <h2>Conclusion</h2>
+      <div class="grille">
+        <label class="champ large">Résultat de l'intervention<select id="resultat" required></select></label>
+        <label class="champ large">Observation<textarea id="observation" maxlength="1500"></textarea></label>
+      </div>
+    </section>
+    <section>
+      <h2>Remarque ou réclamation</h2>
+      <p class="aide">Votre message est envoyé au superviseur sur Telegram. Il ne modifie pas le rapport.</p>
+      <div class="grille">
+        <label class="champ">Type
+          <select id="rq-type"><option>Remarque</option><option>Réclamation</option></select>
+        </label>
+        <label class="champ">Sujet
+          <select id="rq-sujet"><option>Forme du rapport</option><option>Contenu du rapport</option><option>Autre</option></select>
+        </label>
+        <label class="champ">Votre nom<input id="rq-nom" maxlength="120" autocomplete="name"></label>
+        <label class="champ">Référence du rapport (facultatif)<input id="rq-reference" maxlength="40" autocomplete="off"></label>
+        <label class="champ large">Message<textarea id="rq-message" maxlength="1500"></textarea></label>
+      </div>
+      <button type="button" class="principal" id="rq-envoyer">Envoyer au superviseur</button>
+      <p id="rq-etat" role="status" aria-live="polite" hidden></p>
+    </section>
+    <button type="button" class="secondaire" id="nouveau">Nouveau rapport</button>
+  </form>
+  <p id="chargement">Chargement du modèle…</p>
+</main>
+<div id="barre" hidden>
+  <div class="barre-int">
+    <div class="avancement"><span id="compteur">0 opération</span><span id="etat-envoi">Brouillon sauvegardé</span></div>
+    <div class="jauge"><div id="jauge"></div></div>
+    <div class="actions">
+      <button type="button" id="btn-pdf">Générer le PDF</button>
+      <button type="button" id="btn-excel">Excel modifiable</button>
+      <button type="button" id="btn-imprimer">Imprimer</button>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  var BASE = 'https://n8n.srv881398.hstgr.cloud/webhook/rapport-assainissement';
+  var CLE_BROUILLON = 'sitb_rp_an_brouillon_v1';
+  var CLE_MODELE = 'sitb_rp_an_modele_v1';
+  var CLE_ENTETE = 'sitb_rp_an_entete_v1';
+  var CLE_CODE = 'sitb_rp_an_code';
+  var CHAMPS_FIXES = ['contrat', 'date', 'date_fin', 'periodicite', 'heure_debut', 'heure_fin', 'trimestre', 'annee'];
+  var LIMITES_CHAMPS = { marche: 60, societe: 120, charge_suivi: 120, local: 120 };
+  var FORME_DEFAUT = { texte: 10.5, titre: 13, sous_titre: 11, infos: 9.5, marge_haut: 6, marge_bas: 11, marge_gauche: 6, marge_droite: 6, espace: 0.75, col_operations: 50, col_fait: 6, col_non_fait: 8, hauteur_logo: 48, hauteur_visa: 72, lignes_vides: 2, couleur_entete: '#c9d6e8', couleur_section: '#dbe4f0' };
+  var CHAMPS_FORME = [
+    ['texte', 'Texte des tableaux (pt)', 8, 13, 0.5], ['titre', 'Titre (pt)', 10, 18, 0.5], ['sous_titre', 'Liste des sous-systèmes (pt)', 8, 14, 0.5], ['infos', 'Infos société (pt)', 7, 12, 0.5],
+    ['marge_haut', 'Marge haut (mm)', 3, 25, 1], ['marge_bas', 'Marge bas (mm)', 8, 25, 1], ['marge_gauche', 'Marge gauche (mm)', 3, 25, 1], ['marge_droite', 'Marge droite (mm)', 3, 25, 1],
+    ['espace', 'Espacement des lignes (pt)', 0, 6, 0.25], ['lignes_vides', 'Lignes libres par équipement', 0, 5, 1], ['col_operations', 'Colonne opérations (%)', 30, 65, 1], ['col_fait', 'Colonne Fait (%)', 4, 12, 1],
+    ['col_non_fait', 'Colonne Non fait (%)', 4, 12, 1], ['hauteur_logo', 'Hauteur des logos (pt)', 24, 80, 1], ['hauteur_visa', 'Hauteur des visas (pt)', 40, 150, 1]
+  ];
+  var MAX_LIBRES = 20, role = 'technicien', rev = 0, notif = null, adm = null;
+  var MAX_EQUIPEMENTS = 40, SEUIL_FILTRE = 12, DEFAUTS_SITE = {};
+  var modele = null, dernier = null, enCours = false, pret = false, compteurUid = 0;
+  var etat = { types: [], instances: [], pieces: [] }, filtres = {};
+  var entete = { logos: {}, infos: '' };
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, classe, texte) { var e = document.createElement(tag); if (classe) e.className = classe; if (texte !== undefined) e.textContent = texte; return e; }
+  function lire(cle) { try { return JSON.parse(localStorage.getItem(cle)); } catch (e) { return null; } }
+  function ecrire(cle, v) { try { localStorage.setItem(cle, JSON.stringify(v)); } catch (e) {} }
+  function effacer(cle) { try { localStorage.removeItem(cle); } catch (e) {} }
+  function lireCode() { try { return sessionStorage.getItem(CLE_CODE) || ''; } catch (e) { return ''; } }
+  function garderCode(c) { try { if (c) sessionStorage.setItem(CLE_CODE, c); else sessionStorage.removeItem(CLE_CODE); } catch (e) {} }
+
+  function message(type, titre, liste) {
+    var m = $('message');
+    m.className = type || '';
+    m.textContent = titre;
+    if (liste && liste.length) {
+      var ul = el('ul');
+      liste.forEach(function (x) { ul.appendChild(el('li', '', x)); });
+      m.appendChild(ul);
+    }
+    m.hidden = false;
+    if (type === 'erreur') m.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function typeDe(id) { return modele.types.filter(function (t) { return t.id === id; })[0]; }
+  function rangPeriode() {
+    var p = modele.periodicites.filter(function (x) { return x.code === $('periodicite').value; })[0];
+    return p ? p.rang : 1;
+  }
+  function operationsDe(inst) {
+    var r = rangPeriode();
+    return typeDe(inst.type).operations.filter(function (o) { return o.rang <= r; });
+  }
+  function nouvelleInstance(type, source, designation, serie) {
+    compteurUid += 1;
+    return { uid: 'i' + Date.now() + compteurUid, type: type, source: source, designation: designation, serie: serie, etat: '', operations: {} };
+  }
+  function trimestreDe(d) { return 'T' + (Math.floor((parseInt(d.slice(5, 7), 10) - 1) / 3) + 1); }
+  function aujourdhui() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  /* En-tête : logos et informations, gardés d'un rapport à l'autre sur cet appareil */
+  function afficherLogo(cle, zoneId, inputId) {
+    var zone = $(zoneId), input = $(inputId);
+    zone.querySelectorAll('img, button').forEach(function (x) { x.remove(); });
+    var l = entete.logos[cle];
+    if (!l) return;
+    var img = el('img'); img.src = l.data; img.alt = 'Logo';
+    var b = el('button', 'secondaire', 'Retirer'); b.type = 'button';
+    b.addEventListener('click', function () { delete entete.logos[cle]; input.value = ''; sauverEntete(); afficherLogo(cle, zoneId, inputId); invalider(); });
+    zone.insertBefore(img, input); zone.appendChild(b);
+  }
+  function sauverEntete() { ecrire(CLE_ENTETE, entete); }
+  function invalider() { dernier = null; }
+  function chargerLogo(input, cle, zoneId) {
+    var f = input.files && input.files[0]; if (!f) return;
+    var url = URL.createObjectURL(f), img = new Image();
+    img.onload = function () {
+      var max = 420, e = Math.min(1, max / Math.max(img.width, img.height));
+      var w = Math.max(1, Math.round(img.width * e)), h = Math.max(1, Math.round(img.height * e));
+      var c = document.createElement('canvas'); c.width = w; c.height = h;
+      var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h);
+      var data = c.toDataURL('image/png');
+      if (data.length > 280000) data = c.toDataURL('image/jpeg', 0.85);
+      URL.revokeObjectURL(url);
+      entete.logos[cle] = { data: data, ratio: w / h };
+      sauverEntete(); afficherLogo(cle, zoneId, input.id); invalider();
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); message('erreur', 'Image illisible : choisissez un fichier PNG ou JPEG.'); };
+    img.src = url;
+  }
+
+  function clesLibres(inst) {
+    return Object.keys(inst.operations).filter(function (k) { return /^libre\d+$/.test(k); })
+      .concat(['libre1', 'libre2'])
+      .filter(function (k, i, l) { return l.indexOf(k) === i; })
+      .sort(function (a, b) { return Number(a.slice(5)) - Number(b.slice(5)); });
+  }
+  function tousChamps(m) {
+    var base = [['marche', 'Marché N°', true], ['societe', 'Société', true], ['intervenants', 'Intervenant(s)', true], ['charge_suivi', 'Chargé de suivi', true], ['local', 'Local / zone', false]];
+    var l = (Array.isArray(m.champs) ? m.champs : []).map(function (c) { return Object.assign({}, c); });
+    base.forEach(function (b) {
+      if (!l.some(function (c) { return c.id === b[0]; })) l.push({ id: b[0], libelle: b[1], requis: b[2], defaut: DEFAUTS_SITE[b[0]] || '', actif: true });
+    });
+    return l;
+  }
+  function champsActifs() { return tousChamps(modele).filter(function (c) { return c.actif !== false; }); }
+  function champsMeta() { return champsActifs().map(function (c) { return c.id; }).concat(CHAMPS_FIXES); }
+  function rendreChamps() {
+    var boite = $('champs-infos'), avant = {};
+    boite.querySelectorAll('input').forEach(function (i) { avant[i.id] = i.value; });
+    boite.textContent = '';
+    champsActifs().forEach(function (c) {
+      var lab = el('label', 'champ', c.libelle + (c.requis ? '' : ' (facultatif)')), i = el('input');
+      i.id = c.id; i.type = 'text'; i.maxLength = LIMITES_CHAMPS[c.id] || 200; i.autocomplete = 'off';
+      i.value = avant[c.id] !== undefined ? avant[c.id] : (c.defaut || '');
+      i.addEventListener('input', function () { i.classList.remove('invalide'); modifie(); });
+      lab.appendChild(i); boite.appendChild(lab);
+    });
+  }
+  function contrats() { return Array.isArray(modele.contrats) ? modele.contrats : []; }
+  function contratActif() { return contrats().filter(function (c) { return c.id === $('contrat').value; })[0]; }
+  function remplirContrats() {
+    var s = $('contrat'), avant = s.value; s.textContent = '';
+    var v = el('option', '', 'Choisir'); v.value = ''; s.appendChild(v);
+    contrats().forEach(function (c) { var o = el('option', '', c.marche + ' – ' + c.societe); o.value = c.id; s.appendChild(o); });
+    if (avant) s.value = avant;
+    if (s.selectedIndex < 0) s.value = '';
+    if (!s.value && contrats().length === 1) {
+      var c1 = contrats()[0]; s.value = c1.id;
+      if ($('marche') && !$('marche').value) $('marche').value = c1.marche;
+      if ($('societe') && !$('societe').value) $('societe').value = c1.societe;
+    }
+  }
+  function changerContrat(avant) {
+    var c = contratActif(), hors = etat.instances.filter(function (i) { return !c || c.types.indexOf(i.type) < 0; });
+    if (hors.length && !window.confirm('Changer de contrat retire ' + hors.length + ' équipement(s) et leur saisie. Continuer ?')) { $('contrat').value = avant; return; }
+    etat.instances = etat.instances.filter(function (i) { return hors.indexOf(i) < 0; });
+    etat.types = etat.types.filter(function (t) { return c && c.types.indexOf(t) >= 0; });
+    if (c) {
+      if ($('marche')) { $('marche').value = c.marche; $('marche').classList.remove('invalide'); }
+      if ($('societe')) { $('societe').value = c.societe; $('societe').classList.remove('invalide'); }
+    }
+    construire(); rendre(); modifie();
+  }
+  function construire() {
+    rendreChamps();
+    $('client').value = modele.client;
+    var per = $('periodicite'), perAvant = per.value, resAvant = $('resultat').value; per.textContent = '';
+    modele.periodicites.forEach(function (p) { var o = el('option', '', p.libelle); o.value = p.code; per.appendChild(o); });
+    var res = $('resultat'); res.textContent = '';
+    var vide = el('option', '', 'Choisir'); vide.value = ''; res.appendChild(vide);
+    modele.resultats.forEach(function (r) { res.appendChild(el('option', '', r)); });
+    if (perAvant) per.value = perAvant;
+    if (resAvant) res.value = resAvant;
+    remplirContrats();
+    var boite = $('sous-systemes'), actif = contratActif(); boite.textContent = '';
+    if (!actif) boite.appendChild(el('p', 'aide', "Choisissez d'abord le contrat."));
+    modele.types.filter(function (t) { return actif && actif.types.indexOf(t.id) >= 0; }).forEach(function (t) {
+      var l = el('label', 'case');
+      var c = el('input'); c.type = 'checkbox'; c.value = t.id; c.checked = etat.types.indexOf(t.id) >= 0;
+      c.addEventListener('change', function () {
+        if (!c.checked) {
+          var n = etat.instances.filter(function (i) { return i.type === t.id; }).length;
+          if (n && !window.confirm('Retirer ' + t.titre + ' et ses ' + n + ' équipement(s) de ce rapport ?')) { c.checked = true; return; }
+          etat.instances = etat.instances.filter(function (i) { return i.type !== t.id; });
+          etat.types = etat.types.filter(function (x) { return x !== t.id; });
+        } else { etat.types.push(t.id); }
+        rendre(); modifie();
+      });
+      l.appendChild(c); l.appendChild(document.createTextNode(t.titre)); boite.appendChild(l);
+    });
+    afficherPieces();
+  }
+
+  function rendre() { rendreArticles(); rendreSections(); $('champ-trimestre').hidden = $('periodicite').value !== 'T'; compter(); }
+
+  function champTexte(texte, valeur, max, surSaisie) {
+    var lab = el('label', 'champ', texte);
+    var i = el('input'); i.maxLength = max; i.value = valeur || '';
+    i.addEventListener('input', function () { surSaisie(i.value); i.classList.remove('invalide'); modifie(); rafraichirTitre(); });
+    lab.appendChild(i); return lab;
+  }
+  function saisie(inst) {
+    return Object.keys(inst.operations).some(function (k) { var r = inst.operations[k]; return r.statut || (r.remarque || '').trim() || (r.libelle || '').trim(); });
+  }
+  function detailsInstance(inst, supprimable) {
+    var d = el('div', 'details');
+    d.appendChild(champTexte('Désignation exacte', inst.designation, 150, function (v) { inst.designation = v; }));
+    d.appendChild(champTexte('N° inventaire', inst.serie, 80, function (v) { inst.serie = v; }));
+    var lab = el('label', 'champ', 'État fonctionnel');
+    var sel = el('select'); sel.id = 'etat-' + inst.uid;
+    var choix = el('option', '', 'Choisir'); choix.value = ''; sel.appendChild(choix);
+    modele.etats.forEach(function (x) { sel.appendChild(el('option', '', x)); });
+    sel.value = inst.etat || '';
+    sel.addEventListener('change', function () { inst.etat = sel.value; sel.classList.remove('invalide'); modifie(); });
+    lab.appendChild(sel); d.appendChild(lab);
+    if (supprimable) {
+      var b = el('button', 'secondaire supprimer', 'Retirer cet équipement'); b.type = 'button';
+      b.addEventListener('click', function () {
+        if (saisie(inst) && !window.confirm('Retirer cet équipement et ses réponses ?')) return;
+        etat.instances = etat.instances.filter(function (x) { return x !== inst; }); rendre(); modifie();
+      });
+      d.appendChild(b);
+    }
+    return d;
+  }
+
+  function appliquerFiltre(blocs, texte) {
+    var q = texte.trim().toLowerCase();
+    blocs.forEach(function (b) { b.hidden = !!q && b.dataset.texte.indexOf(q) < 0 && !b.querySelector('.details'); });
+  }
+
+  function rendreArticles() {
+    var c = $('articles'); c.textContent = '';
+    $('bloc-articles').hidden = !etat.types.length;
+    modele.types.filter(function (t) { return etat.types.indexOf(t.id) >= 0; }).forEach(function (t) {
+      c.appendChild(el('h3', '', t.titre));
+      var lignesEq = [];
+      if (t.equipements.length > SEUIL_FILTRE) {
+        var filtre = el('input', 'filtre'); filtre.type = 'search'; filtre.placeholder = 'Filtrer ' + t.equipements.length + ' équipements (ex. P5, B.O.C)'; filtre.setAttribute('aria-label', 'Filtrer : ' + t.titre); filtre.value = filtres[t.id] || '';
+        filtre.addEventListener('input', function () { filtres[t.id] = filtre.value; appliquerFiltre(lignesEq, filtre.value); });
+        c.appendChild(filtre);
+      }
+      t.equipements.forEach(function (e) {
+        var bloc = el('div', 'article');
+        bloc.dataset.texte = (e.designation + ' ' + e.serie + ' ' + e.lieu).toLowerCase();
+        lignesEq.push(bloc);
+        var inst = etat.instances.filter(function (x) { return x.source === e.id; })[0];
+        var l = el('label', 'case');
+        var cb = el('input'); cb.type = 'checkbox'; cb.checked = !!inst;
+        var texte = el('span', '', e.designation + (e.serie ? ' — ' + e.serie : ''));
+        if (e.lieu) texte.appendChild(el('small', '', e.lieu));
+        cb.addEventListener('change', function () {
+          if (cb.checked) {
+            if (etat.instances.length >= MAX_EQUIPEMENTS) { cb.checked = false; message('erreur', 'Maximum ' + MAX_EQUIPEMENTS + ' équipements par rapport.'); return; }
+            etat.instances.push(nouvelleInstance(t.id, e.id, e.designation, e.serie));
+          } else {
+            if (saisie(inst) && !window.confirm('Retirer ' + inst.designation + ' et ses réponses ?')) { cb.checked = true; return; }
+            etat.instances = etat.instances.filter(function (x) { return x.source !== e.id; });
+          }
+          rendre(); modifie();
+        });
+        l.appendChild(cb); l.appendChild(texte); bloc.appendChild(l);
+        if (inst) bloc.appendChild(detailsInstance(inst, false));
+        c.appendChild(bloc);
+      });
+      appliquerFiltre(lignesEq, filtres[t.id] || '');
+      etat.instances.filter(function (x) { return x.type === t.id && !t.equipements.some(function (e) { return e.id === x.source; }); }).forEach(function (inst) {
+        var bloc = el('div', 'article'); bloc.appendChild(detailsInstance(inst, true)); c.appendChild(bloc);
+      });
+      var ajout = el('button', 'secondaire', 'Ajouter un équipement'); ajout.type = 'button';
+      ajout.addEventListener('click', function () {
+        if (etat.instances.length >= MAX_EQUIPEMENTS) { message('erreur', 'Maximum ' + MAX_EQUIPEMENTS + ' équipements par rapport.'); return; }
+        etat.instances.push(nouvelleInstance(t.id, null, '', '')); rendre(); modifie();
+      });
+      c.appendChild(ajout);
+    });
+  }
+
+  function titreInstance(inst) { return (inst.designation || 'Équipement à préciser') + (inst.serie ? ' — ' + inst.serie : ''); }
+  function rafraichirTitre() {
+    etat.instances.forEach(function (i) { var s = $('titre-' + i.uid); if (s) s.firstChild.textContent = titreInstance(i); });
+  }
+
+  function rendreSections() {
+    var c = $('sections'); c.textContent = '';
+    modele.types.forEach(function (t) {
+      etat.instances.filter(function (i) { return i.type === t.id; }).forEach(function (inst) {
+        var d = el('details', 'bloc'); d.open = true; d.id = 'sec-' + inst.uid;
+        var s = el('summary');
+        var titre = el('span'); titre.id = 'titre-' + inst.uid;
+        titre.appendChild(document.createTextNode(titreInstance(inst))); titre.appendChild(el('small', '', t.titre));
+        var compte = el('span', 'compte'); compte.id = 'compte-' + inst.uid;
+        s.appendChild(titre); s.appendChild(compte); d.appendChild(s);
+        operationsDe(inst).forEach(function (o, n) { d.appendChild(ligneOperation(inst, o.id, o.libelle, false, n === 0)); });
+        clesLibres(inst).forEach(function (k) { d.appendChild(ligneOperation(inst, k, 'Autre opération (facultatif)', true, false)); });
+        var ajout = el('button', 'secondaire ajout-ligne', 'Ajouter une opération'); ajout.type = 'button';
+        ajout.addEventListener('click', function () {
+          var cles = clesLibres(inst);
+          if (cles.length >= MAX_LIBRES) { message('erreur', 'Maximum ' + MAX_LIBRES + ' opérations ajoutées par équipement.'); return; }
+          var k = 'libre' + (Number(cles[cles.length - 1].slice(5)) + 1);
+          var ligne = ligneOperation(inst, k, 'Autre opération', true, false);
+          d.insertBefore(ligne, ajout);
+          ligne.querySelector('input').focus();
+          modifie();
+        });
+        d.appendChild(ajout);
+        c.appendChild(d);
+      });
+    });
+  }
+
+  function ligneOperation(inst, id, libelle, libre, premier) {
+    var r = inst.operations[id] || (inst.operations[id] = { statut: '', remarque: '' });
+    var div = el('div', 'operation' + (premier ? ' premier' : '')); div.id = 'ligne-' + inst.uid + '-' + id;
+    var ligne = el('div', 'ligne-op');
+    var t, porteur = null;
+    if (libre) {
+      t = el('input', 'libre'); t.placeholder = libelle; t.maxLength = 200; t.value = r.libelle || '';
+      t.setAttribute('aria-label', libelle);
+      t.addEventListener('input', function () { r.libelle = t.value; t.classList.remove('invalide'); modifie(); });
+      if (Number(id.slice(5)) > 2) {
+        porteur = el('div', 'ligne-suppr'); porteur.appendChild(t);
+        var x = el('button', 'retirer', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Retirer cette opération');
+        x.addEventListener('click', function () { delete inst.operations[id]; div.remove(); modifie(); });
+        porteur.appendChild(x);
+      }
+    } else { t = el('div', 'libelle', libelle); }
+    var choix = el('div', 'choix'); choix.setAttribute('role', 'group'); choix.setAttribute('aria-label', libelle);
+    var bf = bouton('Fait', 'fait'), bn = bouton('Non fait', 'non');
+    var rem = el('input'); rem.maxLength = 400; rem.value = r.remarque || '';
+    rem.setAttribute('aria-label', 'Remarque : ' + libelle);
+    function maj() {
+      bf.setAttribute('aria-pressed', r.statut === 'fait'); bn.setAttribute('aria-pressed', r.statut === 'non_fait');
+      rem.placeholder = r.statut === 'non_fait' ? 'Motif obligatoire' : 'Défaillance constatée / remarque';
+    }
+    function choisir(s) { r.statut = r.statut === s ? '' : s; div.classList.remove('a-revoir'); rem.classList.remove('invalide'); maj(); modifie(); }
+    bf.addEventListener('click', function () { choisir('fait'); });
+    bn.addEventListener('click', function () { choisir('non_fait'); });
+    rem.addEventListener('input', function () { r.remarque = rem.value; rem.classList.remove('invalide'); modifie(); });
+    choix.appendChild(bf); choix.appendChild(bn); ligne.appendChild(porteur || t); ligne.appendChild(choix);
+    div.appendChild(ligne); div.appendChild(rem); maj();
+    return div;
+  }
+  function bouton(texte, classe) { var b = el('button', classe, texte); b.type = 'button'; b.setAttribute('aria-pressed', 'false'); return b; }
+
+  function afficherPieces() {
+    var c = $('pieces'); c.textContent = '';
+    etat.pieces.forEach(function (p, i) {
+      var d = el('div', 'piece');
+      d.appendChild(champPiece(p, 'designation', 'Désignation', 'text'));
+      d.appendChild(champPiece(p, 'quantite', 'Qté', 'number'));
+      var r = champPiece(p, 'remarques', 'Remarques', 'text'); r.className = 'remarque'; d.appendChild(r);
+      var x = el('button', 'retirer', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Retirer la pièce');
+      x.addEventListener('click', function () { etat.pieces.splice(i, 1); afficherPieces(); modifie(); });
+      d.appendChild(x); c.appendChild(d);
+    });
+  }
+  function champPiece(p, cle, ph, type) {
+    var i = el('input'); i.type = type; i.placeholder = ph; i.setAttribute('aria-label', ph); i.value = p[cle] || '';
+    if (type === 'number') i.min = '1';
+    i.addEventListener('input', function () { p[cle] = i.value; modifie(); });
+    return i;
+  }
+
+  function charge() {
+    var d = { action: 'generer', meta: {}, types: etat.types, instances: etat.instances, pieces: etat.pieces, resultat: $('resultat').value, observation: $('observation').value, infos_societe: $('infos_societe').value };
+    champsMeta().forEach(function (c) { d.meta[c] = $(c).value; });
+    return d;
+  }
+
+  function compter() {
+    var n = 0, total = 0;
+    etat.instances.forEach(function (inst) {
+      var fait = 0, nb = 0;
+      operationsDe(inst).forEach(function (o) { nb += 1; if ((inst.operations[o.id] || {}).statut) fait += 1; });
+      clesLibres(inst).forEach(function (k) {
+        var r = inst.operations[k] || {};
+        if ((r.libelle || '').trim()) { nb += 1; if (r.statut) fait += 1; }
+      });
+      n += fait; total += nb;
+      var c = $('compte-' + inst.uid); if (c) c.textContent = fait + ' / ' + nb;
+    });
+    $('compteur').textContent = n + ' / ' + total + ' opérations · ' + etat.instances.length + ' équipement(s)';
+    $('jauge').style.width = (total ? n * 100 / total : 0) + '%';
+  }
+  function modifie() {
+    compter(); invalider();
+    ecrire(CLE_BROUILLON, charge());
+    entete.infos = $('infos_societe').value; sauverEntete();
+    $('etat-envoi').textContent = 'Brouillon sauvegardé';
+  }
+
+  function controler() {
+    var e = [], premier = null;
+    function marque(el2, texte) { el2.classList.add('invalide'); e.push(texte); premier = premier || el2; }
+    var requis = champsActifs().filter(function (c) { return c.requis; }).map(function (c) { return c.id; }).concat(['contrat', 'date', 'periodicite', 'heure_debut', 'heure_fin', 'annee', 'resultat']);
+    requis.forEach(function (c) {
+      var x = $(c); x.classList.remove('invalide');
+      if (!x.value.trim()) marque(x, x.parentNode.firstChild.textContent.trim() + ' : champ obligatoire');
+    });
+    var periode = $('duree').value === 'periode', fin = $('date_fin');
+    fin.classList.remove('invalide');
+    if (periode) {
+      if (!fin.value) marque(fin, 'Date de fin : champ obligatoire');
+      else if ($('date').value && fin.value <= $('date').value) marque(fin, 'La date de fin doit suivre la date de début');
+      else if ($('date').value && (Date.parse(fin.value) - Date.parse($('date').value)) / 86400000 > 90) marque(fin, 'Période limitée à 90 jours');
+    }
+    if (!periode && $('heure_debut').value && $('heure_fin').value && $('heure_fin').value <= $('heure_debut').value) marque($('heure_fin'), "L'heure de fin doit suivre l'heure de début");
+    if (!etat.types.length) { e.push('Sélectionnez au moins un sous-système'); premier = premier || $('sous-systemes'); }
+    if (!etat.instances.length) { e.push('Sélectionnez au moins un équipement'); premier = premier || $('bloc-articles'); }
+    etat.instances.forEach(function (inst) {
+      var nom = inst.designation || 'Équipement à préciser';
+      if (!(inst.designation || '').trim()) { e.push('Désignation manquante : ' + typeDe(inst.type).titre); premier = premier || $('articles'); }
+      if (!inst.etat) marque($('etat-' + inst.uid), 'État fonctionnel manquant : ' + nom);
+      function verifier(id, libelle) {
+        var r = inst.operations[id], d = $('ligne-' + inst.uid + '-' + id);
+        d.classList.remove('a-revoir');
+        var champs = d.querySelectorAll('input'), motif = champs[champs.length - 1];
+        if (!r.statut) { d.classList.add('a-revoir'); e.push('Sans réponse : ' + nom + ' : ' + libelle); premier = premier || d; $('sec-' + inst.uid).open = true; }
+        else if (r.statut === 'non_fait' && !(r.remarque || '').trim()) { marque(motif, 'Motif obligatoire : ' + nom + ' : ' + libelle); $('sec-' + inst.uid).open = true; }
+      }
+      operationsDe(inst).forEach(function (o) { verifier(o.id, o.libelle); });
+      clesLibres(inst).forEach(function (k) {
+        var r = inst.operations[k], l = (r.libelle || '').trim();
+        if (l) verifier(k, l);
+        else if (r.statut || (r.remarque || '').trim()) marque($('ligne-' + inst.uid + '-' + k).querySelector('input'), 'Opération à préciser : ' + nom);
+      });
+    });
+    if (premier && premier.focus && premier.tagName !== 'DIV') premier.focus();
+    return e;
+  }
+
+  function bloquer(v, texte) {
+    enCours = v;
+    $('btn-pdf').disabled = v; $('btn-imprimer').disabled = v; $('btn-excel').disabled = v;
+    if (texte) $('etat-envoi').textContent = texte;
+  }
+
+  async function obtenir() {
+    var e = controler();
+    if (e.length) { message('erreur', e.length + ' point(s) à corriger', e.slice(0, 8)); return null; }
+    var d = charge(), cle = JSON.stringify(d);
+    if (dernier && dernier.cle === cle) return dernier;
+    bloquer(true, 'Création du rapport…');
+    try {
+      var ctrl = new AbortController();
+      var limite = setTimeout(function () { ctrl.abort(); }, 120000);
+      var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ code: lireCode(), logos: entete.logos }, d)), signal: ctrl.signal });
+      clearTimeout(limite);
+      var r = await rep.json();
+      if (r.acces === false) { garderCode(''); afficherAcces(); message('erreur', 'Mot de passe incorrect. Votre saisie reste sur cet appareil.'); return null; }
+      if (!r.ok) { message('erreur', 'Rapport refusé', r.erreurs || []); return null; }
+      dernier = { cle: cle, reference: r.reference, html: r.html, pdf: r.pdf_base64, xlsx: r.xlsx_base64 };
+      $('rq-reference').value = r.reference;
+      message('succes', 'Rapport ' + r.reference + ' enregistré au registre.');
+      return dernier;
+    } catch (err) {
+      message('erreur', 'Envoi impossible : vérifiez le réseau puis réessayez. Votre saisie reste sur cet appareil.');
+      return null;
+    } finally {
+      bloquer(false, 'Brouillon sauvegardé');
+    }
+  }
+
+  function telecharger(contenu, type, nom) {
+    var bin = atob(contenu), n = bin.length, tab = new Uint8Array(n);
+    for (var i = 0; i < n; i += 1) tab[i] = bin.charCodeAt(i);
+    var url = URL.createObjectURL(new Blob([tab], { type: type }));
+    var a = document.createElement('a'); a.href = url; a.download = nom;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+  }
+
+  function imprimer(r) {
+    var ancien = $('cadre-impression'); if (ancien) ancien.remove();
+    var f = document.createElement('iframe'); f.id = 'cadre-impression'; f.title = 'Impression du rapport';
+    f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+    f.onload = function () { f.contentWindow.focus(); f.contentWindow.print(); };
+    f.srcdoc = r.html;
+    document.body.appendChild(f);
+  }
+
+  function majDuree() {
+    var periode = $('duree').value === 'periode';
+    $('champ-date-fin').hidden = !periode; $('aide-periode').hidden = !periode;
+    $('lib-date').textContent = periode ? 'Date de début' : "Date d'intervention";
+    if (!periode) { $('date_fin').value = ''; $('date_fin').classList.remove('invalide'); }
+    $('date_fin').min = $('date').value;
+  }
+
+  function restaurer() {
+    var b = lire(CLE_BROUILLON), en = lire(CLE_ENTETE);
+    if (en) { entete.logos = en.logos || {}; entete.infos = en.infos || ''; }
+    if (b) {
+      etat.types = Array.isArray(b.types) ? b.types : [];
+      etat.instances = Array.isArray(b.instances) ? b.instances.filter(function (i) { return typeDe(i.type); }) : [];
+      etat.pieces = Array.isArray(b.pieces) ? b.pieces : [];
+    }
+    construire();
+    if (b) {
+      if (b.meta && b.meta.contrat) { $('contrat').value = b.meta.contrat; construire(); }
+      champsMeta().forEach(function (c) { var v = (b.meta || {})[c]; if (v !== undefined && v !== null && v !== '') $(c).value = v; });
+      $('resultat').value = b.resultat || ''; $('observation').value = b.observation || '';
+    } else {
+      var d = aujourdhui();
+      $('date').value = d; $('trimestre').value = trimestreDe(d); $('annee').value = d.slice(0, 4);
+    }
+    $('duree').value = $('date_fin').value ? 'periode' : 'jour'; majDuree();
+    $('infos_societe').value = (b && b.infos_societe) || entete.infos;
+    afficherLogo('societe', 'zone-societe', 'logo-societe');
+    afficherLogo('hopital', 'zone-hopital', 'logo-hopital');
+    rendre();
+  }
+
+  /* Administration du modèle : réservée au rôle admin, vérifié aussi par le serveur */
+  function nouvelId(p) { compteurUid += 1; return p + Date.now().toString(36) + compteurUid; }
+  function champAdmin(texte, valeur, surSaisie, zone, large) {
+    var lab = el('label', 'champ' + (large ? ' large' : ''), texte);
+    var i = el(zone ? 'textarea' : 'input'); i.value = valeur || '';
+    i.addEventListener('input', function () { surSaisie(i.value); });
+    lab.appendChild(i); return lab;
+  }
+  function saisie1(ph, valeur, surSaisie) {
+    var i = el('input'); i.placeholder = ph; i.setAttribute('aria-label', ph); i.value = valeur || '';
+    i.addEventListener('input', function () { surSaisie(i.value); });
+    return i;
+  }
+  function boutonRetirer(texte, action) {
+    var b = el('button', 'retirer', '×'); b.type = 'button'; b.setAttribute('aria-label', texte);
+    b.addEventListener('click', action); return b;
+  }
+  function ligneAdminOp(t, o, liste) {
+    var d = el('div', 'adm-op');
+    d.appendChild(saisie1('Opération', o.libelle, function (v) { o.libelle = v; }));
+    var s = el('select'); s.setAttribute('aria-label', 'Périodicité');
+    modele.periodicites.forEach(function (p) { var x = el('option', '', p.libelle); x.value = p.rang; s.appendChild(x); });
+    s.value = o.rang;
+    s.addEventListener('change', function () { o.rang = Number(s.value); });
+    d.appendChild(s);
+    var up = el('button', 'retirer', '↑'); up.type = 'button'; up.setAttribute('aria-label', 'Monter cette opération');
+    up.addEventListener('click', function () {
+      var i = t.operations.indexOf(o); if (i < 1) return;
+      t.operations.splice(i, 1); t.operations.splice(i - 1, 0, o);
+      liste.insertBefore(d, d.previousSibling);
+    });
+    d.appendChild(up);
+    d.appendChild(boutonRetirer('Retirer cette opération', function () { t.operations.splice(t.operations.indexOf(o), 1); d.remove(); }));
+    return d;
+  }
+  function ligneAdminEq(t, e) {
+    var d = el('div', 'adm-eq');
+    d.appendChild(saisie1('Désignation', e.designation, function (v) { e.designation = v; }));
+    d.appendChild(saisie1('N° inventaire', e.serie, function (v) { e.serie = v; }));
+    d.appendChild(saisie1('Lieu', e.lieu, function (v) { e.lieu = v; }));
+    d.appendChild(boutonRetirer('Retirer cet équipement', function () { t.equipements.splice(t.equipements.indexOf(e), 1); d.remove(); }));
+    return d;
+  }
+  function blocType(t) {
+    var d = el('details', 'bloc');
+    var s = el('summary'); var titre = el('span', '', t.titre);
+    s.appendChild(titre); d.appendChild(s);
+    var rempli = false;
+    function remplir() {
+      if (rempli) return; rempli = true;
+      d.appendChild(champAdmin('Nom du sous-système', t.titre, function (v) { t.titre = v; titre.textContent = v || 'Sans nom'; }));
+      d.appendChild(el('h3', '', 'Opérations'));
+      var ops = el('div');
+      t.operations.forEach(function (o) { ops.appendChild(ligneAdminOp(t, o, ops)); });
+      d.appendChild(ops);
+      var a = el('button', 'secondaire', 'Ajouter une opération'); a.type = 'button';
+      a.addEventListener('click', function () {
+        var o = { id: nouvelId(t.id + '_o'), libelle: '', rang: 1 }; t.operations.push(o);
+        var l = ligneAdminOp(t, o, ops); ops.appendChild(l); l.querySelector('input').focus();
+      });
+      d.appendChild(a);
+      d.appendChild(el('h3', '', 'Équipements'));
+      var eqs = el('div');
+      t.equipements.forEach(function (e) { eqs.appendChild(ligneAdminEq(t, e)); });
+      d.appendChild(eqs);
+      var b = el('button', 'secondaire', 'Ajouter un équipement'); b.type = 'button';
+      b.addEventListener('click', function () {
+        var e = { id: nouvelId(t.id + '_e'), designation: '', serie: '', lieu: '' }; t.equipements.push(e);
+        var l = ligneAdminEq(t, e); eqs.appendChild(l); l.querySelector('input').focus();
+      });
+      d.appendChild(b);
+      var x = el('button', 'secondaire danger ajout-ligne', 'Supprimer ce sous-système'); x.type = 'button'; x.style.display = 'block';
+      x.addEventListener('click', function () {
+        if (!window.confirm('Supprimer ' + (t.titre || 'ce sous-système') + ' ?')) return;
+        adm.modele.types.splice(adm.modele.types.indexOf(t), 1); d.remove();
+      });
+      d.appendChild(x);
+    }
+    d.addEventListener('toggle', function () { if (d.open) remplir(); });
+    return d;
+  }
+  function lignes(v) { return v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); }
+  function ligneAdminContrat(c) {
+    var d = el('div', 'adm-contrat');
+    var m = saisie1('N° du marché', c.marche, function (v) { c.marche = v; }); m.type = 'text'; m.maxLength = 60;
+    var s = saisie1('Société titulaire', c.societe, function (v) { c.societe = v; }); s.type = 'text'; s.maxLength = 120;
+    var o = el('textarea'); o.rows = 3; o.maxLength = 600; o.placeholder = 'Objet du contrat'; o.setAttribute('aria-label', 'Objet du contrat'); o.value = c.objet;
+    o.addEventListener('input', function () { c.objet = o.value; });
+    var cases = el('div', 'cases');
+    adm.modele.types.forEach(function (t) {
+      var l = el('label', 'case'), i = el('input'); i.type = 'checkbox'; i.checked = c.types.indexOf(t.id) >= 0;
+      i.addEventListener('change', function () { c.types = c.types.filter(function (x) { return x !== t.id; }); if (i.checked) c.types.push(t.id); });
+      l.appendChild(i); l.appendChild(document.createTextNode(t.titre)); cases.appendChild(l);
+    });
+    var x = boutonRetirer('Supprimer ce contrat', function () {
+      if (!window.confirm('Supprimer le contrat ' + (c.marche || '') + ' de la liste ?')) return;
+      adm.modele.contrats.splice(adm.modele.contrats.indexOf(c), 1); afficherContrats();
+    });
+    [m, s, o, cases, x].forEach(function (e) { d.appendChild(e); });
+    return d;
+  }
+  function afficherContrats() {
+    var b = $('adm-contrats'); b.textContent = '';
+    adm.modele.contrats.forEach(function (c) { b.appendChild(ligneAdminContrat(c)); });
+  }
+  function ligneAdminChamp(c) {
+    var d = el('div', 'adm-champ' + (c.actif === false ? ' retire' : ''));
+    if (c.actif === false) {
+      d.appendChild(el('span', '', c.libelle + ' (supprimé)'));
+      var r = el('button', 'secondaire', 'Rétablir'); r.type = 'button';
+      r.addEventListener('click', function () { c.actif = true; afficherChamps(); });
+      d.appendChild(r); return d;
+    }
+    var n = saisie1("Nom de l'information", c.libelle, function (v) { c.libelle = v; }); n.type = 'text';
+    var v = saisie1('Valeur par défaut (facultatif)', c.defaut, function (x) { c.defaut = x; }); v.type = 'text'; v.maxLength = 200;
+    var lab = el('label', 'case'), o = el('input'); o.type = 'checkbox'; o.checked = !!c.requis;
+    o.addEventListener('change', function () { c.requis = o.checked; });
+    lab.appendChild(o); lab.appendChild(document.createTextNode('Obligatoire'));
+    var up = el('button', 'retirer', '↑'); up.type = 'button'; up.setAttribute('aria-label', 'Monter cette information');
+    up.addEventListener('click', function () {
+      var l = adm.modele.champs, i = l.indexOf(c); if (i < 1) return;
+      l.splice(i, 1); l.splice(i - 1, 0, c); afficherChamps();
+    });
+    var x = boutonRetirer('Supprimer cette information', function () {
+      if (!window.confirm('Supprimer ' + (c.libelle || 'cette information') + ' des prochains rapports ?')) return;
+      if (/^c_/.test(c.id)) adm.modele.champs.splice(adm.modele.champs.indexOf(c), 1); else c.actif = false;
+      afficherChamps();
+    });
+    [n, v, lab, up, x].forEach(function (e) { d.appendChild(e); });
+    return d;
+  }
+  function afficherChamps() {
+    var b = $('adm-champs'); b.textContent = '';
+    adm.modele.champs.forEach(function (c) { b.appendChild(ligneAdminChamp(c)); });
+  }
+  function etatForme(type, texte) { var p = $('adm-forme-etat'); p.className = type; p.textContent = texte; p.hidden = false; }
+  function erreursForme(f) {
+    var e = [];
+    CHAMPS_FORME.forEach(function (c) {
+      var v = f[c[0]];
+      if (v === '' || !isFinite(v) || v < c[2] || v > c[3]) e.push(c[1] + ' : entre ' + c[2] + ' et ' + c[3]);
+    });
+    if (f.col_operations + f.col_fait + f.col_non_fait > 85) e.push('La colonne remarques doit garder au moins 15 %');
+    return e;
+  }
+  function majReste() {
+    var f = adm.modele.forme, r = 100 - f.col_operations - f.col_fait - f.col_non_fait;
+    $('adm-reste').textContent = isFinite(r) ? 'Colonne remarques : ' + r + ' %' : '';
+  }
+  function afficherForme() {
+    var g = $('adm-forme'), f = adm.modele.forme; g.textContent = '';
+    CHAMPS_FORME.forEach(function (c) {
+      var lab = el('label', 'champ', c[1]), i = el('input');
+      i.type = 'number'; i.min = c[2]; i.max = c[3]; i.step = c[4]; i.inputMode = 'decimal'; i.value = f[c[0]];
+      i.addEventListener('input', function () { f[c[0]] = i.value === '' ? '' : Number(i.value); majReste(); });
+      lab.appendChild(i); g.appendChild(lab);
+    });
+    [['couleur_entete', 'Couleur des titres de tableau'], ['couleur_section', 'Couleur des titres de section']].forEach(function (c) {
+      var lab = el('label', 'champ', c[1]), i = el('input');
+      i.type = 'color'; i.value = f[c[0]];
+      i.addEventListener('input', function () { f[c[0]] = i.value; });
+      lab.appendChild(i); g.appendChild(lab);
+    });
+    majReste();
+  }
+  async function apercuForme() {
+    var e = erreursForme(adm.modele.forme);
+    if (e.length) { etatForme('erreur', e.join(' · ')); return; }
+    var b = $('adm-apercu'); b.disabled = true;
+    etatForme('', 'Préparation de l\'aperçu…');
+    try {
+      var ctrl = new AbortController();
+      var limite = setTimeout(function () { ctrl.abort(); }, 60000);
+      var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal, body: JSON.stringify({ code: lireCode(), action: 'apercu_forme', forme: adm.modele.forme, logos: entete.logos }) });
+      clearTimeout(limite);
+      var r = await rep.json();
+      if (!r.ok || !r.pdf_base64) { etatForme('erreur', (r.erreurs || ['Aperçu impossible. Réessayez.']).join(' ')); return; }
+      telecharger(r.pdf_base64, 'application/pdf', 'apercu-rapport.pdf');
+      etatForme('succes', 'Aperçu téléchargé. Il n\'est pas ajouté au registre.');
+    } catch (err) {
+      etatForme('erreur', 'Aperçu impossible : vérifiez le réseau puis réessayez.');
+    } finally { b.disabled = false; }
+  }
+  function ouvrirAdmin() {
+    adm = { modele: JSON.parse(JSON.stringify(modele)), notif: Object.assign({ actif: false, chat_id: '' }, notif || {}) };
+    adm.modele.forme = Object.assign({}, FORME_DEFAUT, adm.modele.forme || {});
+    afficherForme(); $('adm-forme-etat').hidden = true;
+    adm.modele.champs = tousChamps(adm.modele); afficherChamps();
+    adm.modele.contrats = Array.isArray(adm.modele.contrats) ? adm.modele.contrats : []; afficherContrats();
+    var g = $('adm-general'); g.textContent = '';
+    g.appendChild(champAdmin('Titre du rapport', adm.modele.titre, function (v) { adm.modele.titre = v; }, false, true));
+    g.appendChild(champAdmin('Client', adm.modele.client, function (v) { adm.modele.client = v; }, false, true));
+    g.appendChild(champAdmin('Objet du contrat', adm.modele.objet_contrat, function (v) { adm.modele.objet_contrat = v; }, true, true));
+    g.appendChild(champAdmin('États fonctionnels (un par ligne)', adm.modele.etats.join('\n'), function (v) { adm.modele.etats = lignes(v); }, true));
+    g.appendChild(champAdmin("Résultats de l'intervention (un par ligne)", adm.modele.resultats.join('\n'), function (v) { adm.modele.resultats = lignes(v); }, true));
+    $('adm-notif').checked = adm.notif.actif; $('adm-chat').value = adm.notif.chat_id || '';
+    var c = $('adm-types'); c.textContent = '';
+    adm.modele.types.forEach(function (t) { c.appendChild(blocType(t)); });
+    $('form').hidden = true; $('barre').hidden = true; $('bandeau-admin').hidden = true; $('admin').hidden = false;
+    $('message').hidden = true; window.scrollTo(0, 0);
+  }
+  function fermerAdmin() {
+    adm = null; $('admin').hidden = true; $('form').hidden = false; $('barre').hidden = false; $('bandeau-admin').hidden = false;
+    window.scrollTo(0, 0);
+  }
+  async function enregistrerModele() {
+    adm.notif = { actif: $('adm-notif').checked, chat_id: $('adm-chat').value.trim() };
+    var ef = erreursForme(adm.modele.forme);
+    if (ef.length) { message('erreur', 'Mise en forme à corriger', ef.slice(0, 8)); return; }
+    var b = $('adm-enregistrer'); b.disabled = true;
+    try {
+      var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: lireCode(), action: 'enregistrer_modele', rev: rev, modele: adm.modele, notif: adm.notif }) });
+      var r = await rep.json();
+      if (!r.ok) { message('erreur', 'Modèle non enregistré', r.erreurs || []); return; }
+      rev = r.rev; modele = adm.modele; notif = adm.notif; ecrire(CLE_MODELE, modele);
+      etat.types = etat.types.filter(function (id) { return typeDe(id); });
+      etat.instances = etat.instances.filter(function (i) { return typeDe(i.type); });
+      construire(); rendre(); invalider(); fermerAdmin();
+      message('succes', 'Modèle enregistré. Il s\'applique à tous les utilisateurs au prochain chargement de la page.');
+    } catch (e) {
+      message('erreur', 'Enregistrement impossible : vérifiez le réseau puis réessayez.');
+    } finally { b.disabled = false; }
+  }
+
+  function etatRemarque(type, texte) {
+    var p = $('rq-etat'); p.className = type; p.textContent = texte; p.hidden = false;
+  }
+  async function envoyerRemarque() {
+    var nom = $('rq-nom').value.trim(), texte = $('rq-message').value.trim();
+    $('rq-nom').classList.toggle('invalide', !nom);
+    $('rq-message').classList.toggle('invalide', !texte);
+    if (!nom || !texte) { etatRemarque('erreur', 'Indiquez votre nom et votre message.'); return; }
+    var b = $('rq-envoyer'); b.disabled = true;
+    etatRemarque('', 'Envoi en cours…');
+    try {
+      var ctrl = new AbortController();
+      var limite = setTimeout(function () { ctrl.abort(); }, 30000);
+      var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: ctrl.signal, body: JSON.stringify({ code: lireCode(), action: 'envoyer_remarque', type: $('rq-type').value, sujet: $('rq-sujet').value, nom: nom, reference: $('rq-reference').value.trim(), message: texte }) });
+      clearTimeout(limite);
+      var r = await rep.json();
+      if (r.acces === false) { garderCode(''); afficherAcces(); message('erreur', 'Mot de passe incorrect. Votre saisie reste sur cet appareil.'); return; }
+      if (!r.ok) { etatRemarque('erreur', (r.erreurs || ['Envoi impossible. Réessayez.']).join(' ')); return; }
+      $('rq-message').value = '';
+      etatRemarque('succes', 'Message envoyé au superviseur.');
+    } catch (e) {
+      etatRemarque('erreur', 'Envoi impossible : vérifiez le réseau puis réessayez. Votre message est conservé.');
+    } finally { b.disabled = false; }
+  }
+
+  function afficherAcces() {
+    $('chargement').hidden = true; $('form').hidden = true; $('barre').hidden = true; $('admin').hidden = true; $('bandeau-admin').hidden = true; $('acces').hidden = false;
+    $('code').value = ''; $('code').focus();
+  }
+
+  async function connecter() {
+    var code = lireCode();
+    if (!code) { afficherAcces(); return; }
+    $('chargement').hidden = false; $('acces').hidden = true;
+    try {
+      var rep = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: code, action: 'modele' }) });
+      var r = await rep.json();
+      if (r.acces === false) { garderCode(''); afficherAcces(); message('erreur', 'Mot de passe incorrect.'); return; }
+      if (!r.ok || !r.modele) throw new Error('modele');
+      modele = r.modele; role = r.role || 'technicien'; rev = r.rev; notif = r.notif || null; ecrire(CLE_MODELE, modele);
+      $('bandeau-admin').hidden = role !== 'admin';
+    } catch (e) {
+      modele = lire(CLE_MODELE);
+      if (!modele) { afficherAcces(); message('erreur', 'Service indisponible : vérifiez le réseau puis réessayez.'); return; }
+      message('', 'Hors ligne : modèle enregistré utilisé. La saisie reste possible, le PDF demandera du réseau.');
+    }
+    if (!pret) demarrer();
+    else { $('chargement').hidden = true; $('acces').hidden = true; $('form').hidden = false; $('barre').hidden = false; }
+  }
+
+  function demarrer() {
+    pret = true;
+    restaurer();
+    $('chargement').hidden = true; $('acces').hidden = true; $('form').hidden = false; $('barre').hidden = false;
+    CHAMPS_FIXES.concat(['resultat', 'observation', 'infos_societe']).forEach(function (c) {
+      $(c).addEventListener('input', function () { $(c).classList.remove('invalide'); modifie(); });
+    });
+    $('periodicite').addEventListener('change', function () { rendre(); modifie(); });
+    var contratAvant = '';
+    $('contrat').addEventListener('focus', function () { contratAvant = $('contrat').value; });
+    $('contrat').addEventListener('change', function () { $('contrat').classList.remove('invalide'); changerContrat(contratAvant); contratAvant = $('contrat').value; });
+    $('duree').addEventListener('change', function () { majDuree(); modifie(); });
+    $('date').addEventListener('change', function () {
+      var d = $('date').value;
+      $('date_fin').min = d;
+      if (d) { $('trimestre').value = trimestreDe(d); $('annee').value = d.slice(0, 4); modifie(); }
+    });
+    $('logo-societe').addEventListener('change', function () { chargerLogo(this, 'societe', 'zone-societe'); });
+    $('logo-hopital').addEventListener('change', function () { chargerLogo(this, 'hopital', 'zone-hopital'); });
+    $('ajout-piece').addEventListener('click', function () { etat.pieces.push({ designation: '', quantite: '1', remarques: '' }); afficherPieces(); modifie(); });
+    $('nouveau').addEventListener('click', function () {
+      if (!window.confirm('Effacer ce brouillon et commencer un nouveau rapport ?')) return;
+      effacer(CLE_BROUILLON); window.location.reload();
+    });
+    $('btn-pdf').addEventListener('click', async function () { if (enCours) return; var r = await obtenir(); if (r) telecharger(r.pdf, 'application/pdf', r.reference + '.pdf'); });
+    $('btn-excel').addEventListener('click', async function () {
+      if (enCours) return;
+      var r = await obtenir();
+      if (!r) return;
+      if (r.xlsx) telecharger(r.xlsx, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', r.reference + '.xlsx');
+      else message('erreur', "Le fichier Excel n'a pas pu être créé pour ce rapport. Le PDF reste disponible.");
+    });
+    $('btn-admin').addEventListener('click', ouvrirAdmin);
+    $('rq-envoyer').addEventListener('click', envoyerRemarque);
+    $('adm-fermer').addEventListener('click', fermerAdmin);
+    $('adm-apercu').addEventListener('click', apercuForme);
+    $('adm-ajout-contrat').addEventListener('click', function () {
+      adm.modele.contrats.push({ id: 'm' + nouvelId('').toLowerCase(), marche: '', societe: '', objet: '', types: [] }); afficherContrats();
+    });
+    $('adm-ajout-champ').addEventListener('click', function () {
+      var c = { id: nouvelId('c_'), libelle: '', requis: false, defaut: '', actif: true };
+      adm.modele.champs.push(c); afficherChamps();
+      $('adm-champs').lastChild.querySelector('input').focus();
+    });
+    $('adm-defaut').addEventListener('click', function () { adm.modele.forme = Object.assign({}, FORME_DEFAUT); afficherForme(); });
+    $('adm-enregistrer').addEventListener('click', enregistrerModele);
+    $('adm-ajout-type').addEventListener('click', function () {
+      var t = { id: nouvelId('t'), titre: 'Nouveau sous-système', operations: [], equipements: [] };
+      adm.modele.types.push(t);
+      var d = blocType(t); d.open = true; $('adm-types').appendChild(d);
+    });
+    $('btn-imprimer').addEventListener('click', async function () { if (enCours) return; var r = await obtenir(); if (r) imprimer(r); });
+  }
+
+  $('form').addEventListener('submit', function (e) { e.preventDefault(); });
+  $('form-acces').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var c = $('code').value; if (!c) return;
+    $('message').hidden = true; garderCode(c); connecter();
+  });
+  connecter();
+})();
+</script>
+</body>
+</html>
