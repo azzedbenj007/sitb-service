@@ -264,7 +264,7 @@
   <div class="barre-int">
     <div class="avancement"><span id="compteur">0 opération</span><span id="etat-envoi">Brouillon sauvegardé</span></div>
     <div class="jauge"><div id="jauge"></div></div>
-    <div class="nature" role="group" aria-label="Nature du rapport"><span>Ce rapport est :</span><button type="button" id="nat-off" aria-pressed="true">Officiel</button><button type="button" id="nat-test" aria-pressed="false">Test</button></div>
+    <div class="nature" role="group" aria-label="Nature du rapport"><span>Ce rapport est (obligatoire) :</span><button type="button" id="nat-off" aria-pressed="false">Officiel</button><button type="button" id="nat-test" aria-pressed="false">Test</button></div>
     <div class="actions">
       <button type="button" id="btn-pdf">Générer le PDF</button>
       <button type="button" id="btn-excel">Excel modifiable</button>
@@ -689,13 +689,14 @@
     if (texte) $('etat-envoi').textContent = texte;
   }
 
-  var nature = 'officiel';
+  var nature = '';
   function choisirNature(n) {
     nature = n;
     $('nat-off').setAttribute('aria-pressed', n === 'officiel' ? 'true' : 'false');
     $('nat-test').setAttribute('aria-pressed', n === 'test' ? 'true' : 'false');
   }
   async function obtenir() {
+    if (nature !== 'officiel' && nature !== 'test') { message('erreur', 'Choisissez d’abord « Officiel » ou « Test » au-dessus de « Générer le PDF ».'); $('nat-off').focus(); return null; }
     var e = controler();
     if (e.length) { message('erreur', e.length + ' point(s) à corriger', e.slice(0, 8)); return null; }
     var d = charge(), cle = JSON.stringify(d);
