@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Statistiques du service SITB | Hôpital des Enfants</title>
+<style>
+  :root {
+    --fond: #f3f6fb; --panneau: #ffffff; --bord: #c9d5e4; --bord-doux: #e3eaf3;
+    --texte: #16243a; --doux: #55647a; --pale: #8693a6; --bleu: #1565d8; --bleu-fort: #1258c0;
+    --vert: #157a4f; --rouge: #c8303a;
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300; --s7: #6250d6; --s8: #e34948;
+    --st-bon: #0ca30c; --st-attention: #fab219; --st-serieux: #ec835a; --st-critique: #d03b3b;
+    --neutre: #b7c3d3;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fond); color: var(--texte); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--bleu-fort); }
+  button, input, select { font: inherit; }
+  input, select { min-height: 44px; padding: 8px 10px; border: 1px solid var(--bord); border-radius: 7px; background: #fff; color: var(--texte); width: 100%; }
+  input:focus, select:focus, button:focus-visible { outline: 2px solid var(--bleu); outline-offset: 1px; }
+  .btn { min-height: 44px; padding: 0 16px; border-radius: 7px; border: 1px solid var(--bleu); background: var(--bleu); color: #fff; font-weight: 700; cursor: pointer; }
+  .btn.sec { background: #fff; color: var(--bleu-fort); }
+  .btn:disabled { opacity: .55; cursor: wait; }
+  .lien-btn { background: none; border: 0; color: var(--bleu-fort); font-weight: 600; cursor: pointer; padding: 8px 4px; min-height: 44px; }
+
+  /* Connexion */
+  #connexion { max-width: 440px; margin: 0 auto; padding: 40px 16px; }
+  .carte { background: var(--panneau); border: 1px solid var(--bord); border-radius: 12px; padding: 20px; }
+  .surtitre { color: var(--bleu-fort); font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+  h1 { font-size: 23px; line-height: 1.2; margin: 4px 0 8px; }
+  .aide { color: var(--doux); font-size: 14px; margin: 0 0 14px; }
+  .onglets-cx { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--bord); border-radius: 8px; overflow: hidden; margin: 16px 0; }
+  .onglets-cx button { min-height: 44px; border: 0; background: #eef2f8; color: var(--doux); font-weight: 600; cursor: pointer; }
+  .onglets-cx button[aria-selected="true"] { background: var(--bleu); color: #fff; }
+  label.champ { display: block; font-size: 14px; color: var(--doux); margin-bottom: 12px; }
+  label.champ input { margin-top: 4px; }
+  .msg { margin-top: 12px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--bord); font-size: 14px; }
+  .msg.erreur { border-color: var(--rouge); color: #8e1f27; background: #fdf3f4; }
+  .msg.ok { border-color: var(--vert); color: #0f5a3a; background: #f0f8f4; }
+
+  /* Tableau de bord */
+  header.haut { background: var(--panneau); border-bottom: 1px solid var(--bord); position: sticky; top: 0; z-index: 20; }
+  .haut-int { max-width: 1280px; margin: 0 auto; padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .haut-int .titre { flex: 1 1 260px; min-width: 0; }
+  .haut-int h1 { font-size: 19px; margin: 0; }
+  .haut-int .meta { color: var(--doux); font-size: 13px; }
+  .haut-int .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  nav.onglets { max-width: 1280px; margin: 0 auto; padding: 0 16px 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  nav.onglets button { min-height: 40px; padding: 0 12px; border: 1px solid var(--bord); border-radius: 20px; background: #fff; color: var(--doux); font-weight: 600; font-size: 14px; cursor: pointer; }
+  nav.onglets button[aria-selected="true"] { background: var(--texte); border-color: var(--texte); color: #fff; }
+  main { max-width: 1280px; margin: 0 auto; padding: 14px 16px 60px; }
+  .filtres { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-bottom: 14px; }
+  .filtres label { font-size: 13px; color: var(--doux); flex: 1 1 150px; max-width: 260px; }
+  .filtres label.large { flex: 1 1 240px; max-width: none; }
+  .filtres input, .filtres select { margin-top: 3px; }
+  .periode { display: flex; flex-wrap: wrap; gap: 6px; }
+  .periode button { min-height: 40px; padding: 0 12px; border: 1px solid var(--bord); border-radius: 7px; background: #fff; color: var(--doux); font-weight: 600; font-size: 14px; cursor: pointer; }
+  .periode button[aria-pressed="true"] { border-color: var(--bleu); color: var(--bleu-fort); background: #eaf2fd; }
+  .bandeau-periode { font-size: 13px; color: var(--doux); margin: -6px 0 12px; }
+
+  .tuiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .tuile { background: var(--panneau); border: 1px solid var(--bord); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+  .tuile .lib { color: var(--doux); font-size: 13px; }
+  .tuile .val { font-size: 26px; font-weight: 700; line-height: 1.15; margin-top: 2px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .tuile .sous { color: var(--pale); font-size: 12.5px; margin-top: 2px; }
+  .tuile.alerte { border-left: 4px solid var(--st-critique); }
+  .tuile.attention { border-left: 4px solid var(--st-attention); }
+  .tuile.bon { border-left: 4px solid var(--st-bon); }
+
+  .grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 12px; margin-bottom: 14px; }
+  .bloc { background: var(--panneau); border: 1px solid var(--bord); border-radius: 10px; padding: 14px; min-width: 0; }
+  .bloc.plein { grid-column: 1 / -1; }
+  .bloc h2 { font-size: 15px; margin: 0 0 2px; }
+  .bloc .note { color: var(--doux); font-size: 12.5px; margin: 0 0 10px; }
+  .vide { color: var(--pale); font-size: 14px; padding: 18px 0; text-align: center; }
+
+  /* Barres horizontales */
+  .barres { display: grid; gap: 6px; }
+  .barre { display: grid; grid-template-columns: minmax(90px, 38%) 1fr auto; gap: 8px; align-items: center; font-size: 13.5px; cursor: default; }
+  .barre .nom { color: var(--texte); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .barre .piste { height: 14px; display: flex; gap: 2px; }
+  .barre .seg { height: 100%; border-radius: 0 4px 4px 0; min-width: 2px; }
+  .barre .seg + .seg { border-radius: 0; }
+  .barre .seg:last-child { border-radius: 0 4px 4px 0; }
+  .barre .nb { color: var(--doux); font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+  .barre:hover .nom { color: var(--bleu-fort); }
+  .plus { margin-top: 6px; }
+
+  /* Colonnes */
+  .colonnes { position: relative; }
+  .colonnes svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .colonnes .axe { stroke: var(--bord-doux); }
+  .colonnes text { fill: var(--doux); font-size: 12px; }
+  .legende { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--doux); margin: 0 0 8px; }
+  .legende span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+
+  #infobulle { position: fixed; z-index: 50; pointer-events: none; background: #16243a; color: #fff; font-size: 12.5px; padding: 7px 9px; border-radius: 6px; max-width: 280px; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+  #infobulle b { display: block; margin-bottom: 2px; }
+
+  /* Tables */
+  .table-outils { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+  .table-outils input { flex: 1 1 220px; width: auto; }
+  .table-outils .compte { color: var(--doux); font-size: 13px; }
+  .table-zone { overflow-x: auto; border: 1px solid var(--bord-doux); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--bord-doux); vertical-align: top; }
+  th { background: #f6f8fc; color: var(--doux); font-weight: 600; font-size: 12.5px; cursor: pointer; white-space: nowrap; position: sticky; top: 0; }
+  th[aria-sort="ascending"]::after { content: " ▲"; font-size: 10px; }
+  th[aria-sort="descending"]::after { content: " ▼"; font-size: 10px; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td .court { display: block; min-width: 150px; max-width: 420px; }
+  td { white-space: normal; } td:not(:has(.court)) { white-space: nowrap; }
+  tbody tr:hover { background: #f8fafd; }
+  .pagination { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-top: 8px; font-size: 13px; color: var(--doux); }
+  .puce { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; font-size: 12.5px; }
+  .puce::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c, var(--neutre)); }
+
+  .echeances { display: grid; gap: 6px; }
+  .echeance { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 13.5px; padding: 7px 0; border-bottom: 1px solid var(--bord-doux); }
+  .echeance:last-child { border-bottom: 0; }
+  .echeance small { color: var(--doux); grid-column: 1 / -1; }
+  .jours { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .sources { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+  .source { border: 1px solid var(--bord-doux); border-radius: 8px; padding: 8px 10px; font-size: 13.5px; }
+  .source .etat { font-size: 12.5px; }
+  #chargement { max-width: 1280px; margin: 40px auto; text-align: center; color: var(--doux); }
+  .roue { width: 34px; height: 34px; border: 3px solid var(--bord); border-top-color: var(--bleu); border-radius: 50%; margin: 0 auto 12px; animation: tourne 1s linear infinite; }
+  @keyframes tourne { to { transform: rotate(360deg); } }
+  #alerte-globale { max-width: 1280px; margin: 10px auto 0; padding: 0 16px; }
+  @media (max-width: 760px) { header.haut { position: static; } }
+  @media (max-width: 560px) {
+    .barre { grid-template-columns: minmax(80px, 42%) 1fr auto; }
+    .tuile .val { font-size: 22px; }
+    .haut-int h1 { font-size: 17px; }
+  }
+  @media print {
+    header.haut { position: static; }
+    nav.onglets, .actions, .filtres, .table-outils, .pagination { display: none !important; }
+    body { background: #fff; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Connexion -->
+<section id="connexion" hidden>
+  <div class="carte">
+    <div class="surtitre">SITB · HÔPITAL DES ENFANTS · CHU IBN SINA</div>
+    <h1>Statistiques du service</h1>
+    <p class="aide">Accès réservé aux membres de l'annuaire du service SITB.</p>
+    <div class="onglets-cx" role="tablist">
+      <button type="button" role="tab" id="t-telegram" aria-selected="true">Code Telegram</button>
+      <button type="button" role="tab" id="t-mdp" aria-selected="false">Mot de passe</button>
+    </div>
+    <form id="f-telegram" autocomplete="off">
+      <label class="champ">Votre nom (tel qu'inscrit dans l'annuaire)
+        <input id="nom" name="nom" placeholder="Ex. Siti_ayoub" autocomplete="username" required>
+      </label>
+      <div id="bloc-code" hidden>
+        <label class="champ">Code reçu sur Telegram (bot NOVA)
+          <input id="code" name="code" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="6 chiffres" autocomplete="one-time-code">
+        </label>
+      </div>
+      <button class="btn" id="btn-telegram" type="submit" style="width:100%">Recevoir un code</button>
+      <button class="lien-btn" id="btn-renvoyer" type="button" hidden>Demander un nouveau code</button>
+    </form>
+    <form id="f-mdp" hidden>
+      <label class="champ">Mot de passe
+        <input id="mdp" type="password" autocomplete="current-password" required>
+      </label>
+      <button class="btn" type="submit" style="width:100%">Se connecter</button>
+    </form>
+    <div id="msg-cx" class="msg" hidden></div>
+  </div>
+</section>
+
+<!-- Application -->
+<div id="appli" hidden>
+  <header class="haut">
+    <div class="haut-int">
+      <div class="titre">
+        <h1>Statistiques du service SITB</h1>
+        <div class="meta" id="meta"></div>
+      </div>
+      <div class="actions">
+        <button class="btn sec" id="btn-actualiser" type="button">Actualiser les données</button>
+        <button class="btn sec" id="btn-imprimer" type="button">Imprimer</button>
+        <button class="btn sec" id="btn-sortir" type="button">Déconnexion</button>
+      </div>
+    </div>
+    <nav class="onglets" id="onglets" role="tablist"></nav>
+  </header>
+  <div id="alerte-globale"></div>
+  <div id="chargement" hidden><div class="roue"></div><div id="chargement-txt">Chargement des statistiques…</div></div>
+  <main id="contenu"></main>
+</div>
+<div id="infobulle" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+  var BASE = 'https://n8n.srv881398.hstgr.cloud/webhook/stats-sitb';
+  var CLE = 'sitb_stats_session';
+  var $ = function (id) { return document.getElementById(id); };
+  var etat = { session: null, donnees: null, sources: {}, maj: '', onglet: 'synthese', periode: '12m', du: '', au: '', filtres: {} };
+
+  // ---------- utilitaires ----------
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function norm(s) { return String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+  var nf = new Intl.NumberFormat('fr-FR');
+  function nb(n) { return n == null || isNaN(n) ? '—' : nf.format(Math.round(n)); }
+  function dh(n) { if (n == null || isNaN(n)) return '—'; if (Math.abs(n) >= 1e6) return (n / 1e6).toLocaleString('fr-FR', { maximumFractionDigits: 2 }) + ' M DH'; if (Math.abs(n) >= 1e4) return Math.round(n / 1e3).toLocaleString('fr-FR') + ' k DH'; return nf.format(Math.round(n)) + ' DH'; }
+  function pct(a, b) { return b ? Math.round(a * 100 / b) + ' %' : '—'; }
+  function dfr(iso) { if (!iso) return ''; var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function aujourdhui() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function ajouterJours(iso, n) { var d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+  function joursEntre(a, b) { return Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 86400000); }
+  var MOIS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+  function moisLib(ym) { var p = ym.split('-'); return MOIS[+p[1] - 1] + ' ' + p[0].slice(2); }
+  function compter(liste, f) { var c = {}; liste.forEach(function (x) { var v = typeof f === 'function' ? f(x) : x[f]; (Array.isArray(v) ? v : [v]).forEach(function (k) { k = k || 'Non renseigné'; c[k] = (c[k] || 0) + 1; }); }); return c; }
+  function sommer(liste, f, g) { var c = {}; liste.forEach(function (x) { var k = (typeof f === 'function' ? f(x) : x[f]) || 'Non renseigné'; c[k] = (c[k] || 0) + (g(x) || 0); }); return c; }
+  function versListe(c) { return Object.keys(c).map(function (k) { return { nom: k, val: c[k] }; }).sort(function (a, b) { return b.val - a.val; }); }
+  function uniques(liste, f) { var s = {}; liste.forEach(function (x) { var v = x[f]; if (v) s[v] = 1; }); return Object.keys(s).sort(function (a, b) { return a.localeCompare(b, 'fr'); }); }
+  function personnes(v) { return String(v || '').split(' + ').filter(Boolean); }
+  function lireSession() { try { var s = JSON.parse(localStorage.getItem(CLE) || 'null'); return s && s.jeton ? s : null; } catch (e) { return null; } }
+  function garderSession(s) { try { if (s) localStorage.setItem(CLE, JSON.stringify(s)); else localStorage.removeItem(CLE); } catch (e) {} }
+
+  async function appel(corps, delai) {
+    var ctrl = new AbortController(), t = setTimeout(function () { ctrl.abort(); }, delai || 30000);
+    try {
+      var r = await fetch(BASE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps), signal: ctrl.signal });
+      var txt = await r.text(), j = null;
+      try { j = JSON.parse(txt); } catch (e) { throw new Error('Réponse inattendue du serveur (' + r.status + ').'); }
+      return j || {};
+    } catch (e) {
+      if (e.name === 'AbortError') throw new Error('Le serveur met trop de temps à répondre. Réessayez.');
+      if (e instanceof TypeError) throw new Error('Serveur injoignable. Vérifiez la connexion internet.');
+      throw e;
+    } finally { clearTimeout(t); }
+  }
+
+  // ---------- connexion ----------
+  function messageCx(texte, type) { var m = $('msg-cx'); m.hidden = !texte; m.className = 'msg ' + (type || ''); m.textContent = texte || ''; }
+  function ongletCx(mdp) {
+    $('t-telegram').setAttribute('aria-selected', String(!mdp)); $('t-mdp').setAttribute('aria-selected', String(mdp));
+    $('f-telegram').hidden = mdp; $('f-mdp').hidden = !mdp; messageCx('');
+    (mdp ? $('mdp') : $('nom')).focus();
+  }
+  $('t-telegram').onclick = function () { ongletCx(false); };
+  $('t-mdp').onclick = function () { ongletCx(true); };
+  var codeDemande = false;
+  async function demanderCode() {
+    var nom = $('nom').value.trim(); if (nom.length < 3) { messageCx('Saisissez votre nom.', 'erreur'); return; }
+    $('btn-telegram').disabled = true;
+    try {
+      var r = await appel({ action: 'code', nom: nom });
+      if (!r.ok) { messageCx(r.erreur || 'Envoi impossible.', 'erreur'); return; }
+      codeDemande = true; $('bloc-code').hidden = false; $('btn-renvoyer').hidden = false; $('btn-telegram').textContent = 'Se connecter';
+      messageCx(r.message, 'ok'); $('code').focus();
+    } catch (e) { messageCx(e.message, 'erreur'); } finally { $('btn-telegram').disabled = false; }
+  }
+  $('btn-renvoyer').onclick = demanderCode;
+  $('nom').addEventListener('input', function () { if (codeDemande) { codeDemande = false; $('bloc-code').hidden = true; $('btn-renvoyer').hidden = true; $('btn-telegram').textContent = 'Recevoir un code'; $('code').value = ''; } });
+  $('f-telegram').onsubmit = async function (ev) {
+    ev.preventDefault();
+    if (!codeDemande) return demanderCode();
+    var code = $('code').value.replace(/\D/g, ''); if (code.length !== 6) { messageCx('Le code contient 6 chiffres.', 'erreur'); return; }
+    $('btn-telegram').disabled = true;
+    try {
+      var r = await appel({ action: 'verifier', nom: $('nom').value.trim(), code: code });
+      if (!r.ok) { messageCx(r.erreur || 'Connexion refusée.', 'erreur'); return; }
+      ouvrir(r);
+    } catch (e) { messageCx(e.message, 'erreur'); } finally { $('btn-telegram').disabled = false; }
+  };
+  $('f-mdp').onsubmit = async function (ev) {
+    ev.preventDefault();
+    var b = ev.submitter || this.querySelector('button'); b.disabled = true;
+    try {
+      var r = await appel({ action: 'mdp', mot_de_passe: $('mdp').value });
+      $('mdp').value = '';
+      if (!r.ok) { messageCx(r.erreur || 'Connexion refusée.', 'erreur'); return; }
+      ouvrir(r);
+    } catch (e) { messageCx(e.message, 'erreur'); } finally { b.disabled = false; }
+  };
+  function ouvrir(r) { etat.session = { jeton: r.jeton, role: r.role, nom: r.nom }; garderSession(etat.session); demarrer(); }
+  function deconnecter(msg) {
+    etat.session = null; etat.donnees = null; garderSession(null);
+    $('appli').hidden = true; $('connexion').hidden = false; codeDemande = false; $('bloc-code').hidden = true; $('btn-renvoyer').hidden = true; $('btn-telegram').textContent = 'Recevoir un code';
+    messageCx(msg || '', msg ? 'erreur' : '');
+  }
+  $('btn-sortir').onclick = function () { deconnecter(''); };
+  $('btn-imprimer').onclick = function () { window.print(); };
+
+  // ---------- chargement ----------
+  async function charger(action) {
+    $('chargement').hidden = false; $('contenu').hidden = true;
+    $('chargement-txt').textContent = action === 'actualiser' ? 'Lecture de tous les registres du service… (environ 20 secondes)' : 'Chargement des statistiques…';
+    $('btn-actualiser').disabled = true;
+    try {
+      var r = await appel({ action: action, jeton: etat.session.jeton }, action === 'actualiser' ? 120000 : 45000);
+      if (r.session === false) return deconnecter(r.erreur);
+      if (!r.ok && r.vide && action !== 'actualiser') return charger('actualiser');
+      if (!r.ok) throw new Error(r.erreur || 'Chargement impossible.');
+      etat.donnees = r.donnees || {}; etat.sources = r.sources || {}; etat.maj = r.maj || '';
+      etat.session.role = r.role || etat.session.role; etat.session.nom = r.nom || etat.session.nom;
+      $('alerte-globale').innerHTML = '';
+      var ko = Object.keys(etat.sources).filter(function (k) { return !etat.sources[k].ok; });
+      if (ko.length) $('alerte-globale').innerHTML = '<div class="msg erreur">' + ko.length + ' source(s) n\'ont pas pu être lues lors de la dernière mise à jour : ' + esc(ko.map(libSource).join(', ')) + '. Voir l\'onglet « Sources ».</div>';
+      afficher();
+    } catch (e) {
+      $('alerte-globale').innerHTML = '<div class="msg erreur">' + esc(e.message) + '</div>';
+    } finally { $('chargement').hidden = true; $('contenu').hidden = false; $('btn-actualiser').disabled = false; }
+  }
+  $('btn-actualiser').onclick = function () { charger('actualiser'); };
+  function demarrer() {
+    $('connexion').hidden = true; $('appli').hidden = false;
+    construireOnglets(); charger('stats');
+  }
+
+  // ---------- période ----------
+  function bornes() {
+    var a = aujourdhui();
+    switch (etat.periode) {
+      case '30j': return [ajouterJours(a, -29), a];
+      case '90j': return [ajouterJours(a, -89), a];
+      case '12m': return [ajouterJours(a, -364), a];
+      case 'annee': return [a.slice(0, 4) + '-01-01', a];
+      case 'perso': return [etat.du || '0000-01-01', etat.au || '9999-12-31'];
+      default: return ['0000-01-01', '9999-12-31'];
+    }
+  }
+  function dansPeriode(liste, champ) { var b = bornes(); return liste.filter(function (x) { var d = x[champ || 'date']; return d && d >= b[0] && d <= b[1]; }); }
+  function libPeriode() { var b = bornes(); if (etat.periode === 'tout') return 'Toute la période'; return 'Du ' + dfr(b[0] === '0000-01-01' ? '' : b[0]) + ' au ' + dfr(b[1] === '9999-12-31' ? aujourdhui() : b[1]); }
+  function selecteurPeriode() {
+    var choix = [['30j', '30 jours'], ['90j', '90 jours'], ['12m', '12 mois'], ['annee', 'Cette année'], ['tout', 'Tout'], ['perso', 'Personnalisée']];
+    var h = '<div class="filtres"><div><div style="font-size:13px;color:var(--doux);margin-bottom:3px">Période</div><div class="periode">' + choix.map(function (c) { return '<button type="button" data-periode="' + c[0] + '" aria-pressed="' + (etat.periode === c[0]) + '">' + c[1] + '</button>'; }).join('') + '</div></div>';
+    if (etat.periode === 'perso') h += '<label>Du<input type="date" id="p-du" value="' + esc(etat.du) + '"></label><label>Au<input type="date" id="p-au" value="' + esc(etat.au) + '"></label>';
+    return h + '</div><div class="bandeau-periode">' + esc(libPeriode()) + ' · s\'applique aux données datées (interventions, tâches, anomalies, documents, rapports, besoins).</div>';
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-periode]'); if (!b) return;
+    etat.periode = b.getAttribute('data-periode'); afficher();
+  });
+  document.addEventListener('change', function (ev) {
+    if (ev.target.id === 'p-du' || ev.target.id === 'p-au') { etat.du = $('p-du').value; etat.au = $('p-au').value; afficher(); }
+    if (ev.target.matches('[data-filtre]')) { etat.filtres[ev.target.getAttribute('data-filtre')] = ev.target.value; afficher(); }
+  });
+
+  // ---------- composants graphiques ----------
+  var COUL = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)', 'var(--s7)', 'var(--s8)'];
+  var STATUT_COUL = {
+    'Critique': 'var(--st-critique)', 'Majeure': 'var(--st-serieux)', 'Mineure': 'var(--st-attention)',
+    'Terminée': 'var(--st-bon)', 'Terminé': 'var(--st-bon)', 'Achevé': 'var(--neutre)', 'Active': 'var(--s1)', 'En cours': 'var(--s1)', 'Annulée': 'var(--neutre)', 'Résilié': 'var(--st-critique)', 'Non exécutée': 'var(--st-serieux)', 'Reportée': 'var(--st-attention)'
+  };
+  var infobulle = $('infobulle');
+  document.addEventListener('mousemove', function (ev) {
+    var el = ev.target.closest('[data-info]');
+    if (!el) { infobulle.hidden = true; return; }
+    infobulle.innerHTML = el.getAttribute('data-info'); infobulle.hidden = false;
+    var x = ev.clientX + 14, y = ev.clientY + 14, w = infobulle.offsetWidth, h = infobulle.offsetHeight;
+    if (x + w > innerWidth - 8) x = ev.clientX - w - 14; if (y + h > innerHeight - 8) y = ev.clientY - h - 14;
+    infobulle.style.left = x + 'px'; infobulle.style.top = y + 'px';
+  });
+  function info(titre, lignes) { return esc('<b>' + esc(titre) + '</b>' + lignes.map(esc).join('<br>')); }
+
+  // Barres horizontales : liste [{nom, val}] ; options : max, format, couleur(nom), total
+  function barres(liste, o) {
+    o = o || {}; var max = o.max || 12, fmt = o.format || nb;
+    if (!liste.length) return '<div class="vide">Aucune donnée sur la période.</div>';
+    var total = liste.reduce(function (s, x) { return s + x.val; }, 0);
+    var montre = liste.slice(0, max), reste = liste.slice(max);
+    if (reste.length && !o.sansAutres) montre.push({ nom: 'Autres (' + reste.length + ')', val: reste.reduce(function (s, x) { return s + x.val; }, 0), autre: true });
+    var haut = Math.max.apply(null, montre.map(function (x) { return x.val; })) || 1;
+    return '<div class="barres">' + montre.map(function (x, i) {
+      var c = x.autre ? 'var(--neutre)' : (o.couleur ? o.couleur(x.nom, i) : 'var(--s1)');
+      return '<div class="barre" data-info="' + info(x.nom, [fmt(x.val) + (o.format ? '' : '') + ' · ' + pct(x.val, total) + ' du total']) + '"><span class="nom">' + esc(x.nom) + '</span><span class="piste"><span class="seg" style="width:' + Math.max(1, x.val * 100 / haut) + '%;background:' + c + '"></span></span><span class="nb">' + fmt(x.val) + '</span></div>';
+    }).join('') + '</div>';
+  }
+  // Barres empilées : lignes [{nom, parts:{serie:val}}], series [noms]
+  function barresEmpilees(lignes, series, o) {
+    o = o || {}; var max = o.max || 12;
+    if (!lignes.length) return '<div class="vide">Aucune donnée sur la période.</div>';
+    lignes = lignes.slice(0, max);
+    var tot = function (l) { return series.reduce(function (s, k) { return s + (l.parts[k] || 0); }, 0); };
+    var haut = Math.max.apply(null, lignes.map(tot)) || 1;
+    var coul = function (k, i) { return (o.couleurs && o.couleurs[k]) || COUL[i % COUL.length]; };
+    return '<div class="legende">' + series.map(function (k, i) { return '<span style="--c:' + coul(k, i) + '">' + esc(k) + '</span>'; }).join('') + '</div><div class="barres">' + lignes.map(function (l) {
+      var t = tot(l);
+      return '<div class="barre" data-info="' + info(l.nom, series.filter(function (k) { return l.parts[k]; }).map(function (k) { return k + ' : ' + nb(l.parts[k]); }).concat(['Total : ' + nb(t)])) + '"><span class="nom">' + esc(l.nom) + '</span><span class="piste">' + series.map(function (k, i) { var v = l.parts[k] || 0; return v ? '<span class="seg" style="width:' + (v * 100 / haut) + '%;background:' + coul(k, i) + '"></span>' : ''; }).join('') + '</span><span class="nb">' + nb(t) + '</span></div>';
+    }).join('') + '</div>';
+  }
+  function grouper(liste, cle, serie, filtreSeries) {
+    var m = {}; liste.forEach(function (x) { var ks = typeof cle === 'function' ? cle(x) : x[cle]; (Array.isArray(ks) ? ks : [ks]).forEach(function (k) { k = k || 'Non renseigné'; var s = (typeof serie === 'function' ? serie(x) : x[serie]) || 'Non renseigné'; (m[k] = m[k] || {})[s] = (m[k][s] || 0) + 1; }); });
+    return Object.keys(m).map(function (k) { return { nom: k, parts: m[k] }; }).sort(function (a, b) { var ta = 0, tb = 0; for (var s in a.parts) ta += a.parts[s]; for (s in b.parts) tb += b.parts[s]; return tb - ta; });
+  }
+  // Colonnes par mois, empilées par série (≤ 4 séries + Autres)
+  function colonnesMois(liste, champDate, serie, o) {
+    o = o || {};
+    var dates = liste.map(function (x) { return x[champDate]; }).filter(Boolean).sort();
+    if (!dates.length) return '<div class="vide">Aucune donnée sur la période.</div>';
+    var b = bornes(), debut = b[0] === '0000-01-01' ? dates[0] : b[0], fin = b[1] === '9999-12-31' ? dates[dates.length - 1] : b[1];
+    if (debut < dates[0] && etat.periode === 'tout') debut = dates[0];
+    var mois = [], d = debut.slice(0, 7), f = fin.slice(0, 7), garde = 0;
+    while (d <= f && garde++ < 240) { mois.push(d); var y = +d.slice(0, 4), m = +d.slice(5, 7) + 1; if (m > 12) { m = 1; y++; } d = y + '-' + ('0' + m).slice(-2); }
+    if (mois.length > 36) mois = mois.slice(-36);
+    var series = [];
+    if (serie) { var cs = versListe(compter(liste, serie)).map(function (x) { return x.nom; }); series = cs.slice(0, 4); if (cs.length > 4) series.push('Autres'); } else series = ['Total'];
+    var data = mois.map(function (m) { var p = {}; liste.forEach(function (x) { if ((x[champDate] || '').slice(0, 7) !== m) return; var s = serie ? (typeof serie === 'function' ? serie(x) : x[serie]) || 'Non renseigné' : 'Total'; if (series.indexOf(s) < 0) s = 'Autres'; p[s] = (p[s] || 0) + 1; }); return { m: m, p: p }; });
+    var W = 460, H = 210, g = 34, bas = 22, haut = 8, l = (W - g) / data.length, bw = Math.max(3, Math.min(34, l - 3));
+    var max = Math.max.apply(null, data.map(function (x) { var t = 0; for (var k in x.p) t += x.p[k]; return t; })) || 1;
+    var pas = Math.pow(10, Math.floor(Math.log10(max))), ech = Math.ceil(max / pas) * pas; if (ech / pas > 5) pas *= 2; ech = Math.ceil(max / pas) * pas;
+    var y = function (v) { return H - bas - v * (H - bas - haut) / ech; };
+    var coul = function (s, i) { return s === 'Autres' ? 'var(--neutre)' : ((o.couleurs && o.couleurs[s]) || COUL[i]); };
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.titre || 'Évolution mensuelle') + '">';
+    for (var v = 0; v <= ech; v += pas) svg += '<line class="axe" x1="' + g + '" x2="' + W + '" y1="' + y(v) + '" y2="' + y(v) + '"/><text x="' + (g - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + nb(v) + '</text>';
+    var pasLib = Math.ceil(data.length / 7);
+    data.forEach(function (x, i) {
+      var cx = g + i * l + (l - bw) / 2, base = H - bas, t = 0, lignes = [];
+      series.forEach(function (s, j) { var val = x.p[s] || 0; if (!val) return; var h0 = y(t), h1 = y(t + val); svg += '<rect x="' + cx + '" y="' + (h1 + (t ? 1 : 0)) + '" width="' + bw + '" height="' + Math.max(1, h0 - h1 - (t ? 1 : 0)) + '" rx="' + (j === series.length - 1 || !series.slice(j + 1).some(function (s2) { return x.p[s2]; }) ? 3 : 0) + '" fill="' + coul(s, j) + '"/>'; t += val; lignes.push(s + ' : ' + nb(val)); });
+      if (series.length > 1) lignes.push('Total : ' + nb(t));
+      svg += '<rect x="' + (g + i * l) + '" y="' + haut + '" width="' + l + '" height="' + (base - haut) + '" fill="transparent" data-info="' + info(moisLib(x.m), lignes.length ? lignes : ['Aucun']) + '"/>';
+      if (i % pasLib === 0) svg += '<text x="' + (g + i * l + l / 2) + '" y="' + (H - 6) + '" text-anchor="middle">' + moisLib(x.m) + '</text>';
+    });
+    svg += '</svg>';
+    var leg = series.length > 1 ? '<div class="legende">' + series.map(function (s, i) { return '<span style="--c:' + coul(s, i) + '">' + esc(s) + '</span>'; }).join('') + '</div>' : '';
+    return '<div class="colonnes">' + leg + svg + '</div>';
+  }
+  function tuile(lib, val, sous, ton) { return '<div class="tuile ' + (ton || '') + '"><div class="lib">' + esc(lib) + '</div><div class="val">' + esc(val) + '</div>' + (sous ? '<div class="sous">' + esc(sous) + '</div>' : '') + '</div>'; }
+  function bloc(titre, corps, note, plein) { return '<section class="bloc' + (plein ? ' plein' : '') + '"><h2>' + esc(titre) + '</h2>' + (note ? '<p class="note">' + esc(note) + '</p>' : '<p class="note"></p>') + corps + '</section>'; }
+  function puce(v) { return '<span class="puce" style="--c:' + (STATUT_COUL[v] || 'var(--neutre)') + '">' + esc(v || '—') + '</span>'; }
+  function selectFiltre(cle, lib, valeurs) {
+    var v = etat.filtres[cle] || '';
+    return '<label>' + esc(lib) + '<select data-filtre="' + cle + '"><option value="">Tous</option>' + valeurs.map(function (x) { return '<option' + (x === v ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '</select></label>';
+  }
+  function appliquerFiltres(liste, champs) { return liste.filter(function (x) { return champs.every(function (c) { var v = etat.filtres[c[0]]; if (!v) return true; var val = x[c[1]]; return c[2] ? personnes(val).indexOf(v) >= 0 : val === v; }); }); }
+
+  // ---------- table ----------
+  var tables = {};
+  function table(id, colonnes, lignes, o) {
+    o = o || {};
+    var t = tables[id] = tables[id] || { tri: o.tri || null, sens: o.sens || -1, q: '', page: 0 };
+    t.colonnes = colonnes; t.lignes = lignes; t.nom = o.nom || id;
+    return '<div class="table-outils"><input type="search" placeholder="Rechercher…" data-table-q="' + id + '" value="' + esc(t.q) + '" aria-label="Rechercher dans le tableau"><span class="compte" id="tc-' + id + '"></span><button class="btn sec" type="button" data-csv="' + id + '">Exporter (CSV)</button></div><div class="table-zone" id="tz-' + id + '"></div><div class="pagination" id="tp-' + id + '"></div>';
+  }
+  function rendreTable(id) {
+    var t = tables[id]; if (!t || !$('tz-' + id)) return;
+    var q = norm(t.q).trim(), lignes = t.lignes;
+    if (q) lignes = lignes.filter(function (l) { return t.colonnes.some(function (c) { return norm(l[c.k]).indexOf(q) >= 0; }); });
+    if (t.tri) { var c = t.colonnes.filter(function (x) { return x.k === t.tri; })[0]; lignes = lignes.slice().sort(function (a, b) { var x = a[t.tri], y = b[t.tri]; if (x == null || x === '') return 1; if (y == null || y === '') return -1; return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'fr', { numeric: true })) * t.sens; }); }
+    t.filtrees = lignes;
+    var parPage = 50, pages = Math.max(1, Math.ceil(lignes.length / parPage)); if (t.page >= pages) t.page = pages - 1;
+    var vue = lignes.slice(t.page * parPage, (t.page + 1) * parPage);
+    var h = '<table><thead><tr>' + t.colonnes.map(function (c) { return '<th data-tri="' + id + ':' + c.k + '"' + (t.tri === c.k ? ' aria-sort="' + (t.sens > 0 ? 'ascending' : 'descending') + '"' : '') + '>' + esc(c.l) + '</th>'; }).join('') + '</tr></thead><tbody>';
+    h += vue.map(function (l) { return '<tr>' + t.colonnes.map(function (c) { var v = l[c.k]; var html = c.h ? c.h(v, l) : (c.f ? esc(c.f(v, l)) : '<span class="court">' + esc(v == null ? '' : v) + '</span>'); return '<td' + (c.num ? ' class="num"' : '') + '>' + html + '</td>'; }).join('') + '</tr>'; }).join('');
+    if (!vue.length) h += '<tr><td colspan="' + t.colonnes.length + '" class="vide">Aucune ligne.</td></tr>';
+    $('tz-' + id).innerHTML = h + '</tbody></table>';
+    $('tc-' + id).textContent = nb(lignes.length) + ' ligne(s)';
+    $('tp-' + id).innerHTML = pages > 1 ? '<button class="btn sec" type="button" data-page="' + id + ':-1"' + (t.page ? '' : ' disabled') + '>Précédent</button><span>Page ' + (t.page + 1) + ' / ' + pages + '</span><button class="btn sec" type="button" data-page="' + id + ':1"' + (t.page < pages - 1 ? '' : ' disabled') + '>Suivant</button>' : '';
+  }
+  document.addEventListener('input', function (ev) { var id = ev.target.getAttribute('data-table-q'); if (id && tables[id]) { tables[id].q = ev.target.value; tables[id].page = 0; rendreTable(id); } });
+  document.addEventListener('click', function (ev) {
+    var th = ev.target.closest('[data-tri]'); if (th) { var p = th.getAttribute('data-tri').split(':'), t = tables[p[0]]; if (t.tri === p[1]) t.sens = -t.sens; else { t.tri = p[1]; t.sens = 1; } rendreTable(p[0]); return; }
+    var pg = ev.target.closest('[data-page]'); if (pg) { var q = pg.getAttribute('data-page').split(':'); tables[q[0]].page += +q[1]; rendreTable(q[0]); return; }
+    var cs = ev.target.closest('[data-csv]'); if (cs) exporter(cs.getAttribute('data-csv'));
+  });
+  function exporter(id) {
+    var t = tables[id], l = t.filtrees || t.lignes, sep = ';';
+    var cel = function (v) { v = v == null ? '' : String(v); return /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    var csv = '﻿' + t.colonnes.map(function (c) { return cel(c.l); }).join(sep) + '\n' + l.map(function (r) { return t.colonnes.map(function (c) { var v = r[c.k]; return cel(c.csv ? c.csv(v, r) : (c.f ? c.f(v, r) : v)); }).join(sep); }).join('\n');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = 'SITB_' + t.nom + '_' + aujourdhui() + '.csv'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  var lienCol = function (v) { return v ? '<a href="' + esc(v) + '" target="_blank" rel="noopener">Ouvrir</a>' : ''; };
+
+  // ---------- onglets ----------
+  var ONGLETS = [
+    ['synthese', 'Synthèse'], ['contrats', 'Contrats MM / BCM'], ['travaux', 'Travaux MT / BCT'], ['documents', 'Documents (GED)'], ['taches', 'Tâches'],
+    ['interventions', 'Interventions'], ['anomalies', 'Anomalies'], ['equipements', 'Équipements'], ['rapports', 'Rapports préventifs'], ['equipe', 'Équipe'], ['besoins', 'Besoins'], ['sources', 'Sources']
+  ];
+  function construireOnglets() {
+    $('onglets').innerHTML = ONGLETS.map(function (o) { return '<button type="button" role="tab" data-onglet="' + o[0] + '" aria-selected="' + (etat.onglet === o[0]) + '">' + esc(o[1]) + '</button>'; }).join('');
+  }
+  $('onglets').addEventListener('click', function (ev) { var b = ev.target.closest('[data-onglet]'); if (!b) return; etat.onglet = b.getAttribute('data-onglet'); construireOnglets(); afficher(); window.scrollTo(0, 0); try { history.replaceState(null, '', '#' + etat.onglet); } catch (e) {} });
+  var h0 = (location.hash || '').slice(1); if (ONGLETS.some(function (o) { return o[0] === h0; })) etat.onglet = h0;
+
+  function D(k) { return (etat.donnees && etat.donnees[k]) || []; }
+  function afficher() {
+    if (!etat.donnees) return;
+    var m = etat.maj ? new Date(etat.maj) : null;
+    $('meta').textContent = (etat.session.nom || '') + (etat.session.role === 'admin' ? ' · administrateur' : '') + (m ? ' · données du ' + m.toLocaleDateString('fr-FR') + ' à ' + m.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '');
+    var f = VUES[etat.onglet] || VUES.synthese;
+    $('contenu').innerHTML = f();
+    Object.keys(tables).forEach(rendreTable);
+  }
+  function auto(htmlTables) { return htmlTables; }
+
+  // ---------- calculs communs ----------
+  function contratsEnCours() { var a = aujourdhui(); return D('contrats').filter(function (c) { return c.statut === 'En cours'; }); }
+  function tacheOuverte(t) { return t.statut === 'Active'; }
+  function anomalieOuverte(a) { return !/(clotur|clôtur|resolu|résolu|termin|ferm)/i.test(a.statut || ''); }
+
+  var VUES = {};
+  // ===== Synthèse =====
+  VUES.synthese = function () {
+
+    var a = aujourdhui(), cec = contratsEnCours(), mt = D('travaux').filter(function (t) { return t.statut === 'En cours'; });
+    var proches = cec.filter(function (c) { return c.fin && c.fin >= a && joursEntre(a, c.fin) <= 120; });
+    var echus = cec.filter(function (c) { return c.fin && c.fin < a; });
+    var tA = D('taches').filter(tacheOuverte), tP = dansPeriode(D('taches'));
+    var iP = dansPeriode(D('interventions')), anoP = dansPeriode(D('anomalies')), anoO = D('anomalies').filter(anomalieOuverte);
+    var rP = dansPeriode(D('rapports')), gP = dansPeriode(D('ged'));
+    var h = selecteurPeriode();
+    h += '<div class="tuiles">' +
+      tuile('Contrats de maintenance en cours', nb(cec.length), cec.filter(function (c) { return c.type === 'MM'; }).length + ' MM · ' + cec.filter(function (c) { return c.type === 'BCM'; }).length + ' BCM') +
+      tuile('Montant des contrats en cours', dh(cec.reduce(function (s, c) { return s + (c.montant || 0); }, 0)), 'TTC, contrats renseignés') +
+      tuile('Échéances sous 120 jours', nb(proches.length), echus.length ? echus.length + ' contrat(s) « en cours » déjà échu(s)' : 'Aucun contrat échu non régularisé', proches.length || echus.length ? 'attention' : 'bon') +
+      tuile('Travaux en cours (MT / BCT)', nb(mt.length), dh(mt.reduce(function (s, c) { return s + (c.montant || 0); }, 0))) +
+      tuile('Tâches actives', nb(tA.length), tA.filter(function (t) { return t.prio === 'Élevée'; }).length + ' de priorité élevée') +
+      tuile('Interventions (période)', nb(iP.length), iP.filter(function (x) { return x.type === 'Corrective'; }).length + ' correctives · ' + iP.filter(function (x) { return x.type === 'Préventive'; }).length + ' préventives') +
+      tuile('Anomalies ouvertes', nb(anoO.length), anoO.filter(function (x) { return x.gravite === 'Critique'; }).length + ' critiques', anoO.some(function (x) { return x.gravite === 'Critique'; }) ? 'alerte' : '') +
+      tuile('Documents GED', nb(D('ged').length), gP.length + ' ajoutés sur la période') +
+      tuile('Équipements inventoriés', nb(D('equipements').length), uniques(D('equipements'), 'cat').length + ' catégories') +
+      tuile('Rapports préventifs (période)', nb(rP.length), uniques(rP, 'famille').length + ' familles de contrats') +
+      '</div><div class="grille">' +
+      bloc('Interventions par mois', colonnesMois(iP, 'date', 'type', { couleurs: { 'Corrective': 'var(--s2)', 'Préventive': 'var(--s1)', 'Améliorative': 'var(--s3)' } }), 'Bot interventions et NOVA, selon le type.') +
+      bloc('Tâches créées par mois', colonnesMois(tP, 'date', 'statut', { couleurs: STATUT_COUL }), 'Selon le statut actuel.') +
+      bloc('Anomalies par gravité (période)', barres(versListe(compter(anoP, 'gravite')), { couleur: function (n) { return STATUT_COUL[n] || 'var(--neutre)'; } })) +
+      bloc('Tâches par statut (période)', barres(versListe(compter(tP, 'statut')), { couleur: function (n) { return STATUT_COUL[n] || 'var(--neutre)'; } })) +
+      bloc('Contrats à surveiller', echeances(echus.concat(proches)), 'Contrats « en cours » échus ou arrivant à échéance dans les 120 jours.') +
+      bloc('Anomalies critiques ouvertes', listeAnomalies(anoO.filter(function (x) { return x.gravite === 'Critique'; }))) +
+      '</div>';
+    return h;
+  };
+  function echeances(liste) {
+    if (!liste.length) return '<div class="vide">Rien à signaler.</div>';
+    var a = aujourdhui();
+    return '<div class="echeances">' + liste.sort(function (x, y) { return x.fin < y.fin ? -1 : 1; }).map(function (c) {
+      var j = joursEntre(a, c.fin), coul = j < 0 ? 'var(--st-critique)' : j <= 60 ? 'var(--st-serieux)' : 'var(--texte)';
+      return '<div class="echeance"><span><b>' + esc(c.type + ' ' + c.num) + '</b> · ' + esc(c.cat) + '</span><span class="jours" style="color:' + coul + '">' + (j < 0 ? 'échu depuis ' + (-j) + ' j' : j + ' j') + '</span><small>' + esc(c.soc) + ' · fin le ' + dfr(c.fin) + (c.agent ? ' · suivi : ' + esc(c.agent) : '') + '</small></div>';
+    }).join('') + '</div>';
+  }
+  function listeAnomalies(liste) {
+    if (!liste.length) return '<div class="vide">Aucune anomalie critique ouverte.</div>';
+    return '<div class="echeances">' + liste.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).slice(0, 12).map(function (x) {
+      return '<div class="echeance"><span>' + esc(x.anomalie) + '</span><span>' + puce(x.gravite) + '</span><small>' + esc([x.service, x.domaine, dfr(x.date), x.resp ? 'resp. ' + x.resp : ''].filter(Boolean).join(' · ')) + '</small></div>';
+    }).join('') + '</div>';
+  }
+
+  // ===== Contrats MM / BCM =====
+  VUES.contrats = function () {
+
+    var tous = D('contrats'), a = aujourdhui();
+    var l = appliquerFiltres(tous, [['c_type', 'type'], ['c_statut', 'statut'], ['c_cat', 'cat'], ['c_agent', 'agent', true], ['c_site', 'site']]);
+    var ec = l.filter(function (c) { return c.statut === 'En cours'; });
+    var echus = ec.filter(function (c) { return c.fin && c.fin < a; });
+    var agents = []; tous.forEach(function (c) { personnes(c.agent).forEach(function (p) { if (agents.indexOf(p) < 0) agents.push(p); }); }); agents.sort();
+    var h = '<div class="filtres">' + selectFiltre('c_type', 'Type', ['MM', 'BCM']) + selectFiltre('c_statut', 'Statut', uniques(tous, 'statut')) + selectFiltre('c_cat', 'Catégorie', uniques(tous, 'cat')) + selectFiltre('c_agent', 'Chargé de suivi', agents) + selectFiltre('c_site', 'Site', uniques(tous, 'site')) + '</div>';
+    h += '<div class="tuiles">' + tuile('Contrats (sélection)', nb(l.length), l.filter(function (c) { return c.type === 'MM'; }).length + ' MM · ' + l.filter(function (c) { return c.type === 'BCM'; }).length + ' BCM') +
+      tuile('En cours', nb(ec.length), dh(ec.reduce(function (s, c) { return s + (c.montant || 0); }, 0))) +
+      tuile('Montant cumulé (sélection)', dh(l.reduce(function (s, c) { return s + (c.montant || 0); }, 0)), l.filter(function (c) { return c.montant == null; }).length + ' sans montant renseigné') +
+      tuile('« En cours » mais échus', nb(echus.length), 'statut à régulariser', echus.length ? 'alerte' : 'bon') +
+      tuile('Contrats « Bleu »', nb(l.filter(function (c) { return c.bleu; }).length), 'avec rapports préventifs numériques') +
+      tuile('Bureau de contrôle exigé', nb(l.filter(function (c) { return /oui/i.test(c.bc); }).length), 'sur ' + l.length) + '</div>';
+    h += '<div class="grille">' +
+      bloc('Par statut', barres(versListe(compter(l, 'statut')), { couleur: function (n) { return STATUT_COUL[n] || 'var(--neutre)'; } })) +
+      bloc('Par catégorie d\'équipement', barresEmpilees(grouper(l, 'cat', 'type'), ['MM', 'BCM']), 'Nombre de contrats, MM et BCM.') +
+      bloc('Montant des contrats en cours par catégorie', barres(versListe(sommer(ec, 'cat', function (c) { return c.montant; })).filter(function (x) { return x.val > 0; }), { format: dh })) +
+      bloc('Par chargé de suivi', barresEmpilees(grouper(l, function (c) { return personnes(c.agent).length ? personnes(c.agent) : ['Non renseigné']; }, 'statut'), uniques(l, 'statut'), { couleurs: STATUT_COUL })) +
+      bloc('Contrats démarrés par année', barresEmpilees(grouper(l.filter(function (c) { return c.debut; }), function (c) { return c.debut.slice(0, 4); }, 'type').sort(function (a, b) { return a.nom < b.nom ? 1 : -1; }), ['MM', 'BCM'], { max: 15 })) +
+      bloc('Titulaires les plus présents', barres(versListe(compter(l, 'soc')))) +
+      bloc('Échéancier des contrats en cours', echeances(ec.filter(function (c) { return c.fin; })), 'Jours restants avant la date de fin.', true) +
+      bloc('Liste des contrats', table('contrats', [
+        { k: 'type', l: 'Type' }, { k: 'num', l: 'N°' }, { k: 'cat', l: 'Catégorie' }, { k: 'objet', l: 'Objet' }, { k: 'soc', l: 'Titulaire' }, { k: 'site', l: 'Site' },
+        { k: 'debut', l: 'Début', f: dfr }, { k: 'fin', l: 'Fin', f: dfr }, { k: 'statut', l: 'Statut', h: puce, csv: function (v) { return v; } }, { k: 'agent', l: 'Suivi' }, { k: 'montant', l: 'Montant TTC', num: true, f: function (v) { return v == null ? '' : nb(v); }, csv: function (v) { return v == null ? '' : v; } }, { k: 'cps', l: 'CPS', h: lienCol, csv: function (v) { return v; } }
+      ], l, { tri: 'debut', sens: -1, nom: 'contrats_maintenance' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Travaux =====
+  VUES.travaux = function () {
+
+    var tous = D('travaux');
+    var l = appliquerFiltres(tous, [['w_type', 'type'], ['w_statut', 'statut'], ['w_equip', 'equip'], ['w_annee', 'annee']]);
+    var ec = l.filter(function (c) { return c.statut === 'En cours'; });
+    var h = '<div class="filtres">' + selectFiltre('w_type', 'Type', uniques(tous, 'type')) + selectFiltre('w_statut', 'Statut', uniques(tous, 'statut')) + selectFiltre('w_equip', 'Domaine / équipement', uniques(tous, 'equip')) + selectFiltre('w_annee', 'Année', uniques(tous, 'annee').reverse()) + '</div>';
+    h += '<div class="tuiles">' + tuile('Contrats de travaux', nb(l.length), l.filter(function (c) { return c.type === 'MT'; }).length + ' MT · ' + l.filter(function (c) { return c.type === 'BCT'; }).length + ' BCT') +
+      tuile('En cours', nb(ec.length), dh(ec.reduce(function (s, c) { return s + (c.montant || 0); }, 0))) +
+      tuile('Montant cumulé', dh(l.reduce(function (s, c) { return s + (c.montant || 0); }, 0)), l.filter(function (c) { return c.montant == null; }).length + ' sans montant') +
+      tuile('Réceptions provisoires', nb(l.filter(function (c) { return c.rp; }).length), nb(l.filter(function (c) { return c.rd; }).length) + ' réceptions définitives') + '</div>';
+    h += '<div class="grille">' +
+      bloc('Par statut', barres(versListe(compter(l, 'statut')), { couleur: function (n) { return STATUT_COUL[n] || 'var(--neutre)'; } })) +
+      bloc('Par domaine', barresEmpilees(grouper(l, 'equip', 'type'), uniques(l, 'type'))) +
+      bloc('Montant par domaine', barres(versListe(sommer(l, 'equip', function (c) { return c.montant; })).filter(function (x) { return x.val > 0; }), { format: dh })) +
+      bloc('Par année', barresEmpilees(grouper(l.filter(function (c) { return c.annee; }), 'annee', 'type').sort(function (a, b) { return a.nom < b.nom ? 1 : -1; }), uniques(l, 'type'), { max: 15 })) +
+      bloc('Par chargé de suivi', barres(versListe(compter(l, function (c) { return personnes(c.agent).length ? personnes(c.agent) : ['Non renseigné']; })))) +
+      bloc('Titulaires', barres(versListe(compter(l.filter(function (c) { return c.soc && c.soc !== '-'; }), 'soc')))) +
+      bloc('Liste des contrats de travaux', table('travaux', [
+        { k: 'type', l: 'Type' }, { k: 'num', l: 'N°' }, { k: 'equip', l: 'Domaine' }, { k: 'objet', l: 'Objet' }, { k: 'soc', l: 'Titulaire' }, { k: 'site', l: 'Site' }, { k: 'annee', l: 'Année' },
+        { k: 'debut', l: 'Commencement', f: dfr }, { k: 'rp', l: 'Réc. provisoire', f: dfr }, { k: 'rd', l: 'Réc. définitive', f: dfr }, { k: 'statut', l: 'Statut', h: puce, csv: function (v) { return v; } }, { k: 'agent', l: 'Suivi' },
+        { k: 'montant', l: 'Montant', num: true, f: function (v) { return v == null ? '' : nb(v); }, csv: function (v) { return v == null ? '' : v; } }, { k: 'cps', l: 'Dossier', h: lienCol, csv: function (v) { return v; } }
+      ], l, { tri: 'annee', sens: -1, nom: 'contrats_travaux' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Documents =====
+  VUES.documents = function () {
+
+    var tous = D('ged');
+    var lf = appliquerFiltres(tous, [['g_doc', 'doc'], ['g_type', 'type'], ['g_equip', 'equip']]);
+    var l = etat.periode === 'tout' ? lf : dansPeriode(lf);
+    var h = selecteurPeriode() + '<div class="filtres">' + selectFiltre('g_doc', 'Type de document', uniques(tous, 'doc')) + selectFiltre('g_type', 'MM / BCM', uniques(tous, 'type')) + selectFiltre('g_equip', 'Équipement', uniques(tous, 'equip')) + '</div>';
+    var parContrat = versListe(compter(lf.filter(function (d) { return d.num; }), function (d) { return d.num + (d.soc ? ' · ' + d.soc : ''); }));
+    h += '<div class="tuiles">' + tuile('Documents (sélection)', nb(lf.length), nb(l.length) + ' ajoutés sur la période') + tuile('Contrats documentés', nb(uniques(lf, 'num').length), uniques(lf, 'soc').length + ' sociétés / services') + tuile('Types de documents', nb(uniques(lf, 'doc').length)) + tuile('Sans lien électronique', nb(lf.filter(function (d) { return !d.lien; }).length), '', lf.some(function (d) { return !d.lien; }) ? 'attention' : 'bon') + '</div>';
+    h += '<div class="grille">' + bloc('Documents ajoutés par mois', colonnesMois(l, 'date', 'type'), 'Selon le type de contrat (MM / BCM ou autre).') +
+      bloc('Par type de document', barres(versListe(compter(l, 'doc')), { max: 15 })) +
+      bloc('Par équipement', barres(versListe(compter(l, 'equip')), { max: 15 })) +
+      bloc('Contrats les plus documentés', barres(parContrat, { max: 15 }), 'Toutes dates confondues.') +
+      bloc('Liste des documents', table('ged', [{ k: 'date', l: 'Ajout', f: dfr }, { k: 'doc', l: 'Document' }, { k: 'num', l: 'Contrat' }, { k: 'type', l: 'MM/BCM' }, { k: 'soc', l: 'Société / service' }, { k: 'equip', l: 'Équipement' }, { k: 'statut', l: 'Statut contrat' }, { k: 'lien', l: 'Fichier', h: lienCol, csv: function (v) { return v; } }], l, { tri: 'date', sens: -1, nom: 'documents_GED' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Tâches =====
+  VUES.taches = function () {
+
+    var tous = D('taches'), a = aujourdhui();
+    var noms = []; tous.forEach(function (t) { personnes(t.assigne).forEach(function (p) { if (noms.indexOf(p) < 0) noms.push(p); }); }); noms.sort();
+    var lf = appliquerFiltres(tous, [['t_qui', 'assigne', true], ['t_prio', 'prio'], ['t_statut', 'statut'], ['t_niveau', 'niveau']]);
+    var l = etat.periode === 'tout' ? lf : dansPeriode(lf);
+    var act = lf.filter(tacheOuverte), term = l.filter(function (t) { return t.statut === 'Terminée'; }), depassees = act.filter(function (t) { return t.echeance && t.echeance < a; });
+    var actives = l.filter(function (t) { return t.statut !== 'Annulée'; });
+    var h = selecteurPeriode() + '<div class="filtres">' + selectFiltre('t_qui', 'Assignée à', noms) + selectFiltre('t_prio', 'Priorité', ['Élevée', 'Moyenne', 'Basse', 'Non précisée']) + selectFiltre('t_statut', 'Statut', uniques(tous, 'statut')) + selectFiltre('t_niveau', 'Niveau', uniques(tous, 'niveau')) + '</div>';
+    h += '<div class="tuiles">' + tuile('Tâches créées (période)', nb(l.length), nb(lf.length) + ' au total') + tuile('Taux d\'achèvement', pct(term.length, actives.length), term.length + ' terminées sur ' + actives.length + ' non annulées', 'bon') +
+      tuile('Actives aujourd\'hui', nb(act.length), act.filter(function (t) { return t.prio === 'Élevée'; }).length + ' de priorité élevée') + tuile('Échéance dépassée', nb(depassees.length), 'tâches actives', depassees.length ? 'alerte' : 'bon') +
+      tuile('Non exécutées / reportées', nb(l.filter(function (t) { return t.statut === 'Non exécutée' || t.statut === 'Reportée'; }).length)) + tuile('Charge (poids) des actives', nb(act.reduce(function (s, t) { return s + (t.poids || 0); }, 0)), 'somme des poids') + '</div>';
+    var statuts = ['Terminée', 'Active', 'Non exécutée', 'Reportée', 'Annulée'];
+    h += '<div class="grille">' + bloc('Tâches créées par mois', colonnesMois(l, 'date', 'statut', { couleurs: STATUT_COUL })) +
+      bloc('Par personne et statut', barresEmpilees(grouper(l, function (t) { return personnes(t.assigne).length ? personnes(t.assigne) : ['Non assignée']; }, 'statut'), statuts.filter(function (s) { return l.some(function (t) { return t.statut === s; }); }), { couleurs: STATUT_COUL, max: 15 })) +
+      bloc('Par priorité', barres(versListe(compter(l, 'prio')), { couleur: function (n) { return n === 'Élevée' ? 'var(--st-critique)' : n === 'Moyenne' ? 'var(--st-attention)' : 'var(--neutre)'; } })) +
+      bloc('Par niveau', barres(versListe(compter(l, function (t) { return t.niveau || 'Non classé'; })))) +
+      bloc('Tâches actives les plus anciennes', table('tachesAct', [{ k: 'id', l: 'Id', num: true }, { k: 'date', l: 'Créée', f: dfr }, { k: 'tache', l: 'Tâche' }, { k: 'assigne', l: 'Assignée à' }, { k: 'prio', l: 'Priorité' }, { k: 'echeance', l: 'Échéance', f: dfr }, { k: 'avancement', l: 'Avancement' }], act, { tri: 'date', sens: 1, nom: 'taches_actives' }), '', true) +
+      bloc('Toutes les tâches (période)', table('taches', [{ k: 'id', l: 'Id', num: true }, { k: 'date', l: 'Créée', f: dfr }, { k: 'tache', l: 'Tâche' }, { k: 'assigne', l: 'Assignée à' }, { k: 'prio', l: 'Priorité' }, { k: 'statut', l: 'Statut', h: puce, csv: function (v) { return v; } }, { k: 'niveau', l: 'Niveau' }, { k: 'poids', l: 'Poids', num: true }, { k: 'echeance', l: 'Échéance', f: dfr }], l, { tri: 'date', sens: -1, nom: 'taches' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Interventions =====
+  VUES.interventions = function () {
+
+    var tous = D('interventions');
+    var lf = appliquerFiltres(tous, [['i_type', 'type'], ['i_service', 'service'], ['i_qui', 'qui', true], ['i_source', 'source']]);
+    var l = dansPeriode(lf);
+    var delais = l.filter(function (x) { return x.delai != null; }).map(function (x) { return x.delai; }).sort(function (a, b) { return a - b; });
+    var med = delais.length ? delais[Math.floor(delais.length / 2)] : null;
+    var quis = []; tous.forEach(function (x) { personnes(x.qui).forEach(function (p) { if (quis.indexOf(p) < 0) quis.push(p); }); }); quis.sort();
+    var h = selecteurPeriode() + '<div class="filtres">' + selectFiltre('i_type', 'Type', uniques(tous, 'type')) + selectFiltre('i_service', 'Service', uniques(tous, 'service')) + selectFiltre('i_qui', 'Intervenant', quis) + selectFiltre('i_source', 'Source', uniques(tous, 'source')) + '</div>';
+    var jours = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    h += '<div class="tuiles">' + tuile('Interventions (période)', nb(l.length), uniques(l, 'service').length + ' services concernés') + tuile('Correctives', nb(l.filter(function (x) { return x.type === 'Corrective'; }).length), pct(l.filter(function (x) { return x.type === 'Corrective'; }).length, l.length)) +
+      tuile('Préventives', nb(l.filter(function (x) { return x.type === 'Préventive'; }).length), pct(l.filter(function (x) { return x.type === 'Préventive'; }).length, l.length)) +
+      tuile('Temps de réponse médian', med == null ? '—' : nb(med), delais.length ? 'unité du registre · ' + delais.length + ' interventions renseignées' : 'non renseigné') +
+      tuile('Intervenants', nb(uniques(l, 'qui').length), l.filter(function (x) { return !x.interne; }).length + ' saisies par des sociétés titulaires') + '</div>';
+    h += '<div class="grille">' + bloc('Interventions par mois', colonnesMois(l, 'date', 'type', { couleurs: { 'Corrective': 'var(--s2)', 'Préventive': 'var(--s1)', 'Améliorative': 'var(--s3)' } })) +
+      bloc('Par service', barres(versListe(compter(l, 'service')), { max: 15 })) +
+      bloc('Par intervenant', barresEmpilees(grouper(l, function (x) { return personnes(x.qui); }, 'type'), uniques(l, 'type'), { couleurs: { 'Corrective': 'var(--s2)', 'Préventive': 'var(--s1)', 'Améliorative': 'var(--s3)' }, max: 15 })) +
+      bloc('Équipements ou installations', barres(versListe(compter(l.filter(function (x) { return x.equip; }), 'equip')), { max: 12 }), 'Lorsque l\'équipement est renseigné.') +
+      bloc('Par jour de la semaine', barres([1, 2, 3, 4, 5, 6, 0].map(function (j) { return { nom: jours[j], val: l.filter(function (x) { return x.date && new Date(x.date + 'T12:00:00').getDay() === j; }).length }; }), { sansAutres: true, max: 7 })) +
+      bloc('Interventions les plus fréquentes', barres(versListe(compter(l, function (x) { return (x.inter || '').replace(/\s+/g, ' ').slice(0, 60); })), { max: 12 })) +
+      bloc('Liste des interventions', table('interv', [{ k: 'date', l: 'Date', f: dfr }, { k: 'inter', l: 'Intervention' }, { k: 'type', l: 'Type' }, { k: 'service', l: 'Service' }, { k: 'empl', l: 'Emplacement' }, { k: 'equip', l: 'Équipement' }, { k: 'qui', l: 'Intervenant' }, { k: 'delai', l: 'Temps de réponse', num: true }, { k: 'source', l: 'Source' }], l, { tri: 'date', sens: -1, nom: 'interventions' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Anomalies =====
+  VUES.anomalies = function () {
+
+    var tous = D('anomalies'), a = aujourdhui();
+    var lf = appliquerFiltres(tous, [['a_grav', 'gravite'], ['a_dom', 'domaine'], ['a_serv', 'service'], ['a_statut', 'statut']]);
+    var l = dansPeriode(lf), ouv = lf.filter(anomalieOuverte);
+    var GRAV = { couleur: function (n) { return STATUT_COUL[n] || 'var(--neutre)'; } };
+    var h = selecteurPeriode() + '<div class="filtres">' + selectFiltre('a_grav', 'Gravité', ['Critique', 'Majeure', 'Mineure', 'Non précisée']) + selectFiltre('a_dom', 'Domaine', uniques(tous, 'domaine')) + selectFiltre('a_serv', 'Service', uniques(tous, 'service')) + selectFiltre('a_statut', 'Statut', uniques(tous, 'statut')) + '</div>';
+    h += '<div class="tuiles">' + tuile('Anomalies (période)', nb(l.length), nb(lf.length) + ' au total') + tuile('Ouvertes', nb(ouv.length), 'tous statuts non clôturés', ouv.length ? 'attention' : 'bon') +
+      tuile('Critiques ouvertes', nb(ouv.filter(function (x) { return x.gravite === 'Critique'; }).length), '', ouv.some(function (x) { return x.gravite === 'Critique'; }) ? 'alerte' : 'bon') +
+      tuile('Échéance dépassée', nb(ouv.filter(function (x) { return x.echeance && x.echeance < a; }).length), 'anomalies ouvertes') + tuile('Liées à une tâche', nb(l.filter(function (x) { return x.tache; }).length), pct(l.filter(function (x) { return x.tache; }).length, l.length)) + '</div>';
+    h += '<div class="grille">' + bloc('Anomalies par mois', colonnesMois(l, 'date', 'gravite', { couleurs: STATUT_COUL })) +
+      bloc('Par gravité', barres(versListe(compter(l, 'gravite')), GRAV)) +
+      bloc('Par domaine', barresEmpilees(grouper(l, 'domaine', 'gravite'), ['Critique', 'Majeure', 'Mineure', 'Non précisée'].filter(function (g) { return l.some(function (x) { return x.gravite === g; }); }), { couleurs: STATUT_COUL })) +
+      bloc('Par service', barres(versListe(compter(l, 'service')), { max: 12 })) +
+      bloc('Par responsable d\'analyse', barres(versListe(compter(l, function (x) { return personnes(x.resp).length ? personnes(x.resp) : ['Non attribué']; })))) +
+      bloc('Statut et décision', barres(versListe(compter(l, function (x) { return (x.statut || 'Nouvelle') + ' · ' + (x.decision || 'sans décision'); })))) +
+      bloc('Liste des anomalies', table('ano', [{ k: 'date', l: 'Date', f: dfr }, { k: 'id', l: 'Id' }, { k: 'anomalie', l: 'Anomalie' }, { k: 'gravite', l: 'Gravité', h: puce, csv: function (v) { return v; } }, { k: 'domaine', l: 'Domaine' }, { k: 'service', l: 'Service' }, { k: 'equip', l: 'Installation' }, { k: 'resp', l: 'Responsable' }, { k: 'statut', l: 'Statut' }, { k: 'decision', l: 'Décision' }, { k: 'echeance', l: 'Échéance', f: dfr }, { k: 'photo', l: 'Photo', h: lienCol, csv: function (v) { return v; } }], l, { tri: 'date', sens: -1, nom: 'anomalies' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Équipements =====
+  VUES.equipements = function () {
+
+    var tous = D('equipements');
+    var l = appliquerFiltres(tous, [['e_cat', 'cat'], ['e_serv', 'service'], ['e_etat', 'etat'], ['e_src', 'source']]);
+    var h = '<div class="filtres">' + selectFiltre('e_cat', 'Catégorie', uniques(tous, 'cat')) + selectFiltre('e_serv', 'Service / local', uniques(tous, 'service')) + selectFiltre('e_etat', 'État physique', uniques(tous, 'etat')) + selectFiltre('e_src', 'Source', uniques(tous, 'source')) + '</div>';
+    h += '<div class="tuiles">' + tuile('Équipements', nb(l.length), uniques(l, 'cat').length + ' catégories') + tuile('Services / locaux', nb(uniques(l, 'service').length)) +
+      tuile('Sans N° d\'inventaire', nb(l.filter(function (x) { return !x.inv; }).length), pct(l.filter(function (x) { return !x.inv; }).length, l.length), 'attention') + tuile('Sans N° de série', nb(l.filter(function (x) { return !x.serie; }).length), pct(l.filter(function (x) { return !x.serie; }).length, l.length)) +
+      tuile('Fiches incomplètes', nb(l.filter(function (x) { return !x.des || !x.service; }).length), 'sans désignation ou sans service') + '</div>';
+    h += '<div class="grille">' + bloc('Par catégorie', barres(versListe(compter(l, 'cat')), { max: 20 })) + bloc('Par service / local', barres(versListe(compter(l, 'service')), { max: 20 })) +
+      bloc('Par état physique', barres(versListe(compter(l, function (x) { return x.etat || 'Non renseigné'; })), { couleur: function (n) { return /bon|service/i.test(n) ? 'var(--st-bon)' : /moyen/i.test(n) ? 'var(--st-attention)' : /mauvais|panne|hors/i.test(n) ? 'var(--st-critique)' : 'var(--neutre)'; } })) +
+      bloc('Saisies par mois', colonnesMois(l.filter(function (x) { return x.date; }), 'date', null), 'Date d\'ajout à l\'inventaire (filtre de période sans effet ici si « Tout »).') +
+      bloc('Inventaire', table('equip', [{ k: 'cat', l: 'Catégorie' }, { k: 'des', l: 'Désignation' }, { k: 'service', l: 'Service / local' }, { k: 'empl', l: 'Emplacement' }, { k: 'inv', l: 'N° inventaire' }, { k: 'serie', l: 'N° série' }, { k: 'etat', l: 'État' }, { k: 'source', l: 'Source' }], l, { tri: 'cat', sens: 1, nom: 'equipements' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Rapports préventifs =====
+  VUES.rapports = function () {
+
+    var tous = D('rapports');
+    var lf = appliquerFiltres(tous, [['r_fam', 'famille'], ['r_soc', 'soc']]);
+    var l = dansPeriode(lf);
+    var nf_ = l.reduce(function (s, r) { return s + (r.non_faites || 0); }, 0), f_ = l.reduce(function (s, r) { return s + (r.faites || 0); }, 0);
+    var h = selecteurPeriode() + '<div class="filtres">' + selectFiltre('r_fam', 'Famille de contrat', uniques(tous, 'famille')) + selectFiltre('r_soc', 'Société', uniques(tous, 'soc')) + '</div>';
+    h += '<div class="tuiles">' + tuile('Rapports (période)', nb(l.length), nb(lf.length) + ' au total') + tuile('Familles actives', nb(uniques(l, 'famille').length), 'sur 13 sites de rapports') +
+      tuile('Opérations faites', nb(f_), pct(f_, f_ + nf_) + ' des opérations prévues', 'bon') + tuile('Opérations non faites', nb(nf_), '', nf_ ? 'attention' : 'bon') +
+      tuile('Rapports avec pièces changées', nb(l.filter(function (r) { return r.pieces; }).length)) + '</div>';
+    h += '<div class="grille">' + bloc('Rapports par mois', colonnesMois(l, 'date', 'famille')) + bloc('Par famille de contrat', barres(versListe(compter(l, 'famille')), { max: 13, sansAutres: true })) +
+      bloc('Opérations non faites par famille', barres(versListe(sommer(l, 'famille', function (r) { return r.non_faites; })).filter(function (x) { return x.val > 0; }), { couleur: function () { return 'var(--st-serieux)'; } })) +
+      bloc('Par société titulaire', barres(versListe(compter(l, 'soc')))) +
+      bloc('Registre des rapports', table('rap', [{ k: 'date', l: 'Date', f: dfr }, { k: 'ref', l: 'Référence' }, { k: 'famille', l: 'Famille' }, { k: 'marche', l: 'Marché' }, { k: 'soc', l: 'Société' }, { k: 'trimestre', l: 'Trimestre' }, { k: 'faites', l: 'Faites', num: true }, { k: 'non_faites', l: 'Non faites', num: true }, { k: 'resultat', l: 'Résultat' }, { k: 'pieces', l: 'Pièces changées' }, { k: 'lien', l: 'PDF', h: lienCol, csv: function (v) { return v; } }], l, { tri: 'date', sens: -1, nom: 'rapports_preventifs' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Équipe =====
+  VUES.equipe = function () {
+
+    var a = aujourdhui(), membres = D('equipe').map(function (m) { return m.nom; });
+    var tP = dansPeriode(D('taches')), iP = dansPeriode(D('interventions')), aP = dansPeriode(D('anomalies')), rec = etat.session.role === 'admin' ? dansPeriode(D('reclamations')) : null;
+    var lignes = membres.map(function (n) {
+      var t = tP.filter(function (x) { return personnes(x.assigne).indexOf(n) >= 0; }), nonAnn = t.filter(function (x) { return x.statut !== 'Annulée'; }), term = t.filter(function (x) { return x.statut === 'Terminée'; });
+      var actAll = D('taches').filter(function (x) { return tacheOuverte(x) && personnes(x.assigne).indexOf(n) >= 0; });
+      var o = { nom: n, taches: t.length, terminees: term.length, taux: nonAnn.length ? Math.round(term.length * 100 / nonAnn.length) : null, actives: actAll.length, depassees: actAll.filter(function (x) { return x.echeance && x.echeance < a; }).length,
+        interventions: iP.filter(function (x) { return personnes(x.qui).indexOf(n) >= 0; }).length, anomalies: aP.filter(function (x) { return personnes(x.resp).indexOf(n) >= 0; }).length,
+        cm: D('contrats').filter(function (c) { return c.statut === 'En cours' && personnes(c.agent).indexOf(n) >= 0; }).length, ct: D('travaux').filter(function (c) { return c.statut === 'En cours' && personnes(c.agent).indexOf(n) >= 0; }).length };
+      if (rec) o.reclamations = rec.filter(function (x) { return personnes(x.qui).indexOf(n) >= 0; }).length;
+      return o;
+    });
+    var cols = [{ k: 'nom', l: 'Membre' }, { k: 'taches', l: 'Tâches (période)', num: true }, { k: 'terminees', l: 'Terminées', num: true }, { k: 'taux', l: 'Taux d\'achèvement', num: true, f: function (v) { return v == null ? '—' : v + ' %'; }, csv: function (v) { return v == null ? '' : v; } }, { k: 'actives', l: 'Actives', num: true }, { k: 'depassees', l: 'Échéance dépassée', num: true }, { k: 'interventions', l: 'Interventions', num: true }, { k: 'anomalies', l: 'Anomalies à analyser', num: true }, { k: 'cm', l: 'CM suivis en cours', num: true }, { k: 'ct', l: 'CT suivis en cours', num: true }];
+    if (rec) cols.push({ k: 'reclamations', l: 'Réclamations', num: true });
+    var h = selecteurPeriode() + '<div class="grille">' +
+      bloc('Tableau de l\'équipe', table('equipe', cols, lignes, { tri: 'taches', sens: -1, nom: 'equipe' }), 'Membres de l\'annuaire. Les tâches, interventions et anomalies suivent la période choisie ; les contrats suivis sont ceux en cours.', true) +
+      bloc('Taux d\'achèvement des tâches', barres(lignes.filter(function (x) { return x.taux != null; }).map(function (x) { return { nom: x.nom, val: x.taux }; }).sort(function (a, b) { return b.val - a.val; }), { format: function (v) { return v + ' %'; }, sansAutres: true, max: 20 }), 'Tâches terminées / tâches non annulées sur la période.') +
+      bloc('Interventions saisies', barres(lignes.map(function (x) { return { nom: x.nom, val: x.interventions }; }).filter(function (x) { return x.val; }).sort(function (a, b) { return b.val - a.val; }), { sansAutres: true, max: 20 })) +
+      bloc('Contrats suivis (en cours)', barresEmpilees(lignes.map(function (x) { return { nom: x.nom, parts: { 'CM (MM/BCM)': x.cm, 'CT (MT/BCT)': x.ct } }; }).filter(function (x) { return x.parts['CM (MM/BCM)'] + x.parts['CT (MT/BCT)']; }).sort(function (a, b) { return (b.parts['CM (MM/BCM)'] + b.parts['CT (MT/BCT)']) - (a.parts['CM (MM/BCM)'] + a.parts['CT (MT/BCT)']); }), ['CM (MM/BCM)', 'CT (MT/BCT)'], { max: 20 })) +
+      bloc('Tâches actives par personne', barres(lignes.map(function (x) { return { nom: x.nom, val: x.actives }; }).filter(function (x) { return x.val; }).sort(function (a, b) { return b.val - a.val; }), { sansAutres: true, max: 20 }));
+    if (rec) h += bloc('Réclamations du personnel (administrateur)', barres(versListe(compter(rec, 'qui')), { couleur: function () { return 'var(--st-serieux)'; } }) + '<div style="margin-top:12px">' + table('rec', [{ k: 'date', l: 'Date', f: dfr }, { k: 'qui', l: 'Personnel' }, { k: 'motif', l: 'Réclamation' }, { k: 'remarque', l: 'Remarque' }], rec, { tri: 'date', sens: -1, nom: 'reclamations' }) + '</div>', 'Visible uniquement par l\'administrateur.', true);
+    return h + '</div>';
+  };
+
+  // ===== Besoins =====
+  VUES.besoins = function () {
+
+    var l = dansPeriode(D('besoins'));
+    var h = selecteurPeriode() + '<div class="tuiles">' + tuile('Expressions de besoin (période)', nb(l.length), nb(D('besoins').length) + ' au total') + tuile('Services demandeurs', nb(uniques(l, 'service').length)) + '</div>';
+    h += '<div class="grille">' + bloc('Par service', barres(versListe(compter(l, 'service')))) + bloc('Besoins exprimés', barres(versListe(compter(l, function (b) { return b.besoin; })))) +
+      bloc('Liste des besoins', table('besoins', [{ k: 'date', l: 'Date', f: dfr }, { k: 'service', l: 'Service' }, { k: 'besoin', l: 'Besoin' }, { k: 'detail', l: 'Détails' }, { k: 'empl', l: 'Emplacement' }], l, { tri: 'date', sens: -1, nom: 'besoins' }), '', true) + '</div>';
+    return h;
+  };
+
+  // ===== Sources =====
+  var LIB = { contrats: 'Contrats de maintenance (MM/BCM)', travaux: 'Contrats de travaux (MT/BCT)', ged: 'GED (vue_agent)', taches: 'Gestion des tâches', interv_bot: 'Interventions (bot Nova_intervention)', interv_sitb: 'Interventions (NOVA)', anomalies: 'Anomalies_SITB', inventaire: 'Inventaire global', equipements_her: 'Registre équipements HER', reclamations: 'Réclamations du personnel', besoins: 'Expressions de besoin' };
+  function libSource(k) { return LIB[k] || (k.indexOf('rp:') === 0 ? 'Rapports préventifs · ' + k.slice(3) : k); }
+  VUES.sources = function () {
+
+    var h = '<div class="grille">' + bloc('État des sources de données', '<div class="sources">' + Object.keys(etat.sources).map(function (k) { var s = etat.sources[k]; return '<div class="source"><b>' + esc(libSource(k)) + '</b><div class="etat">' + (s.ok ? puceTxt('var(--st-bon)', nb(s.lignes) + ' ligne(s) lue(s)') : puceTxt('var(--st-critique)', 'Échec : ' + s.erreur)) + '</div></div>'; }).join('') + '</div>', 'Les registres sont relus automatiquement toutes les 30 minutes. Le bouton « Actualiser les données » force une relecture immédiate.', true);
+    if (etat.session.role === 'admin') h += bloc('Accès par mot de passe (administrateur)', formMdp(), 'La connexion par code Telegram reste toujours disponible pour les membres de l\'annuaire. Un mot de passe vide désactive ce mode de connexion.', true);
+    return h + '</div>';
+  };
+  function puceTxt(c, t) { return '<span class="puce" style="--c:' + c + '">' + esc(t) + '</span>'; }
+  function formMdp() {
+    return '<form id="f-defmdp" class="filtres" style="margin:0"><label>Profil<select id="d-role"><option value="membre">Équipe (lecture, sans réclamations)</option><option value="admin">Administrateur</option></select></label><label class="large">Nouveau mot de passe (10 caractères minimum)<input id="d-mdp" type="password" autocomplete="new-password"></label><label style="flex:0 1 auto;display:flex;gap:8px;align-items:center;min-height:44px"><input id="d-tous" type="checkbox" style="width:20px;min-height:0">Déconnecter toutes les sessions</label><button class="btn" type="submit">Enregistrer</button></form><div id="msg-defmdp" class="msg" hidden></div>';
+  }
+  document.addEventListener('submit', async function (ev) {
+    if (ev.target.id !== 'f-defmdp') return;
+    ev.preventDefault();
+    var m = $('msg-defmdp'), b = ev.target.querySelector('button'); b.disabled = true;
+    try {
+      var r = await appel({ action: 'definir_mdp', jeton: etat.session.jeton, role: $('d-role').value, mot_de_passe: $('d-mdp').value, deconnecter_tous: $('d-tous').checked });
+      if (r.session === false) return deconnecter(r.erreur);
+      m.hidden = false; m.className = 'msg ' + (r.ok ? 'ok' : 'erreur'); m.textContent = r.ok ? r.message : r.erreur;
+      if (r.ok) { $('d-mdp').value = ''; if ($('d-tous').checked) setTimeout(function () { deconnecter('Toutes les sessions ont été fermées. Reconnectez-vous.'); }, 1500); }
+    } catch (e) { m.hidden = false; m.className = 'msg erreur'; m.textContent = e.message; } finally { b.disabled = false; }
+  });
+
+  // ---------- démarrage ----------
+  etat.session = lireSession();
+  if (etat.session) demarrer(); else { $('connexion').hidden = false; }
+})();
+</script>
+</body>
+</html>
