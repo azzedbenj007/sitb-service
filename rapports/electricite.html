@@ -70,6 +70,10 @@
   .avancement { display: flex; justify-content: space-between; font-size: 13px; color: var(--doux); margin-bottom: 6px; gap: 12px; }
   .jauge { height: 5px; background: var(--bord); border-radius: 3px; overflow: hidden; margin-bottom: 9px; }
   .jauge div { height: 100%; width: 0; background: var(--bleu); transition: width .15s; }
+  .nature { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; font-size: 14px; color: var(--doux); flex-wrap: wrap; }
+  .nature button { min-height: 38px; padding: 0 16px; border-radius: 7px; border: 1px solid var(--bord); background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
+  .nature #nat-off[aria-pressed="true"] { background: var(--vert); border-color: var(--vert); color: #fff; }
+  .nature #nat-test[aria-pressed="true"] { background: #b45309; border-color: #b45309; color: #fff; }
   .actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   .actions button { min-height: 48px; border-radius: 7px; border: 1px solid var(--bleu); font: inherit; font-weight: 700; cursor: pointer; }
   #btn-pdf { background: var(--bleu); color: #fff; }
@@ -251,6 +255,7 @@
   <div class="barre-int">
     <div class="avancement"><span id="compteur">0 opération</span><span id="etat-envoi">Brouillon sauvegardé</span></div>
     <div class="jauge"><div id="jauge"></div></div>
+    <div class="nature" role="group" aria-label="Nature du rapport"><span>Ce rapport est :</span><button type="button" id="nat-off" aria-pressed="true">Officiel</button><button type="button" id="nat-test" aria-pressed="false">Test</button></div>
     <div class="actions">
       <button type="button" id="btn-pdf">Générer le PDF</button>
       <button type="button" id="btn-excel">Excel modifiable</button>
@@ -580,7 +585,7 @@
   }
 
   function charge() {
-    var d = { action: 'generer', meta: {}, types: etat.types, instances: etat.instances, pieces: etat.pieces, resultat: $('resultat').value, observation: $('observation').value, infos_societe: $('infos_societe').value };
+    var d = { action: 'generer', nature: nature, meta: {}, types: etat.types, instances: etat.instances, pieces: etat.pieces, resultat: $('resultat').value, observation: $('observation').value, infos_societe: $('infos_societe').value };
     champsMeta().forEach(function (c) { d.meta[c] = $(c).value; });
     return d;
   }
@@ -653,6 +658,12 @@
     if (texte) $('etat-envoi').textContent = texte;
   }
 
+  var nature = 'officiel';
+  function choisirNature(n) {
+    nature = n;
+    $('nat-off').setAttribute('aria-pressed', n === 'officiel' ? 'true' : 'false');
+    $('nat-test').setAttribute('aria-pressed', n === 'test' ? 'true' : 'false');
+  }
   async function obtenir() {
     var e = controler();
     if (e.length) { message('erreur', e.length + ' point(s) à corriger', e.slice(0, 8)); return null; }
@@ -669,7 +680,7 @@
       if (!r.ok) { message('erreur', 'Rapport refusé', r.erreurs || []); return null; }
       dernier = { cle: cle, reference: r.reference, html: r.html, pdf: r.pdf_base64, xlsx: r.xlsx_base64 };
       $('rq-reference').value = r.reference;
-      message('succes', 'Rapport ' + r.reference + ' enregistré au registre.');
+      message('succes', 'Rapport ' + r.reference + (nature === 'test' ? ' enregistré au registre comme TEST.' : ' enregistré au registre comme rapport officiel.'));
       return dernier;
     } catch (err) {
       message('erreur', 'Envoi impossible : vérifiez le réseau puis réessayez. Votre saisie reste sur cet appareil.');
@@ -999,6 +1010,8 @@
       if (!window.confirm('Effacer ce brouillon et commencer un nouveau rapport ?')) return;
       effacer(CLE_BROUILLON); window.location.reload();
     });
+    $('nat-off').addEventListener('click', function () { choisirNature('officiel'); });
+    $('nat-test').addEventListener('click', function () { choisirNature('test'); });
     $('btn-pdf').addEventListener('click', async function () { if (enCours) return; var r = await obtenir(); if (r) telecharger(r.pdf, 'application/pdf', r.reference + '.pdf'); });
     $('btn-excel').addEventListener('click', async function () {
       if (enCours) return;
